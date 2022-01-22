@@ -1,5 +1,5 @@
 import Qs from "qs";
-import request from "umi-request";
+import request from '@/utils/request';
 
 //加载字典
 export async function loadDictionary(params: any) {
@@ -27,10 +27,6 @@ export async function selectDictionary(params: any) {
 export async function insertDictionary(params: any) {
   const res = request('/api/contract-system/insertDictionary', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    dataType: 'json',
     data: Qs.stringify(params),
   });
   return res;
@@ -40,10 +36,6 @@ export async function insertDictionary(params: any) {
 export async function updateDictionary(params: any) {
   const res = request('/api/contract-system/updateDictionary', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    dataType: 'json',
     data: Qs.stringify(params),
   });
   return res;
@@ -52,10 +44,7 @@ export async function updateDictionary(params: any) {
 //删除字典
 export async function deleteDictionary(params: any) {
   const res = request('/api/contract-system/deleteDictionary', {
-    method: 'Post',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+    method: 'POST',
     data: Qs.stringify(params)
   });
   return res;

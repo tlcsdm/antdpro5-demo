@@ -1,5 +1,5 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {Button, message} from 'antd';
+import {Button, message, Popconfirm} from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
 import {PageHeaderWrapper} from '@ant-design/pro-layout';
 import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
@@ -30,43 +30,33 @@ const Applications: React.FC = () => {
 
   //删除字典
   const handleRemove = async (id: any) => {
-    const hide = message.loading('正在删除');
     if (!id) return true;
-    try {
-      await deleteDictionary({
-        I_ID: id
-      });
-      hide();
-      message.success('删除成功，即将刷新');
-      actionRef.current?.reloadAndRest?.(); //刷新Protable
-      return true;
-    } catch (error) {
-      hide();
-      message.error('删除失败，请重试');
-      return false;
-    }
+    const hide = message.loading('正在删除');
+    await deleteDictionary({
+      I_ID: id
+    });
+    hide();
+    message.success('删除成功，即将刷新');
+    actionRef.current?.reloadAndRest?.(); //刷新Protable
+    return true;
   };
 
   const columns: ProColumns[] = [  //定义 Protable的列 columns放在Protable
     {
       title: '序号',
       width: 50,
+      hideInSearch: true,
+      hideInTable: false,
       render: (text, record, index) => `${index + 1}`
     }, {
       title: '编码',
       dataIndex: 'V_CODE',
       width: 150,
-      hideInSearch: true,
+      hideInSearch: false,
       hideInTable: false
     }, {
       title: '名称',
       dataIndex: 'V_NAME',
-      width: 150,
-      hideInSearch: true,
-      hideInTable: false
-    }, {
-      title: '排序',
-      dataIndex: 'I_ORDER',
       width: 150,
       hideInSearch: false,
       hideInTable: false
@@ -74,34 +64,40 @@ const Applications: React.FC = () => {
       title: '字典分类',
       dataIndex: 'V_DICTIONARYTYPE',
       width: 150,
-      hideInSearch: true,
+      hideInSearch: false,
       hideInTable: false
     }, {
       title: '特殊用途标记',
       dataIndex: 'V_OTHER',
       width: 150,
-      hideInSearch: false,
+      hideInSearch: true,
       hideInTable: false
+    }, {
+      title: '排序',
+      dataIndex: 'I_ORDER',
+      width: 150,
+      hideInSearch: true,
+      hideInTable: true
     }, {
       title: '创建时间',
       dataIndex: 'D_DATE_CREATE',
       valueType: 'date',
       width: 150,
-      hideInSearch: false,
-      hideInTable: false
+      hideInSearch: true,
+      hideInTable: true
     }, {
       title: '最后修改时间',
       dataIndex: 'D_DATE_EDIT',
       valueType: 'date',
       width: 150,
-      hideInSearch: false,
-      hideInTable: false
+      hideInSearch: true,
+      hideInTable: true
     }, {
       title: '最后修改人',
       dataIndex: 'V_PER_EDIT',
       width: 150,
-      hideInSearch: false,
-      hideInTable: false
+      hideInSearch: true,
+      hideInTable: true
     }, {
       title: '操作',
       width: 150,
@@ -109,7 +105,11 @@ const Applications: React.FC = () => {
       valueType: 'option',  //操作列的类型
       render: (_, record) => [   //render渲染 record代表当前行
         <a key={record.I_ID} onClick={() => isShowModal(true, record.I_ID)}>编辑</a>,
-        <a key={record.I_ID} onClick={() => handleRemove(record.I_ID)}>删除</a>
+        <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={(e) => {
+          handleRemove(record.I_ID)
+        }}>
+          <a href="#">删除</a>
+        </Popconfirm>
       ]
     }
   ];
@@ -117,13 +117,10 @@ const Applications: React.FC = () => {
   const routes = [
     {
       path: '',
-      breadcrumbName: '一级'
+      breadcrumbName: '系统设置'
     }, {
       path: '',
-      breadcrumbName: '二级'
-    }, {
-      path: '',
-      breadcrumbName: '字典'
+      breadcrumbName: '字典管理'
     }
   ];
 

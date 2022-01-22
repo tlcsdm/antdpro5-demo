@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {message} from 'antd';
-import ProForm, {ModalForm, ProFormDatePicker, ProFormDigit, ProFormText} from '@ant-design/pro-form';
-import 'antd/dist/antd.css';
+import ProForm, {ModalForm, ProFormDigit, ProFormText,} from '@ant-design/pro-form';
+import 'antd/dist/antd.min.css';
 import {insertDictionary, loadDictionary, updateDictionary} from "@/services/contract/common/dictionary";
 
 const UpdateDictionary = (props: any) => {
@@ -15,9 +15,9 @@ const UpdateDictionary = (props: any) => {
   //修改时初始化数据
   const initDictionary = async () => {
     const response = await loadDictionary({I_ID: dictionaryId});
-    const dictionaryData = response.data[0];
+    const dictionaryData = response.data;
 
-    setDictionary({...response.data[0]});
+    setDictionary({...response.data});
     Object.keys(dictionaryData);
     Object.values(dictionaryData);
     Object.keys(dictionaryData).forEach(key => formObj.setFieldsValue({[`${key}`]: dictionaryData[key]}));
@@ -36,27 +36,21 @@ const UpdateDictionary = (props: any) => {
   const handleSubmit = async (fields: any) => {
     const hide = message.loading('处理中...');
     let response = [];
-    try {
-      // 对提交后端日期格式处理
-      const newFields = {};
-      Object.assign(newFields, fields);
-      if (dictionary === undefined) {
-        response = await insertDictionary({...newFields});
-      } else {
-        response = await updateDictionary({I_ID: (dictionary as any).I_ID, ...newFields});
-      }
-      hide();
-      if (response.success) {
-        message.success("操作成功");
-      } else {
-        message.error('操作失败');
-      }
-      return true;
-    } catch (e) {
-      hide();
-      message.error('操作失败');
+    // 对提交后端数据处理
+    const newFields = {};
+    Object.assign(newFields, fields);
+    if (dictionary === undefined) {
+      response = await insertDictionary({...newFields});
+    } else {
+      response = await updateDictionary({I_ID: (dictionary as any).I_ID, ...newFields});
+    }
+    hide();
+    if (response.success) {
+      message.success("操作成功");
+    } else {
       return false;
     }
+    return true;
   };
 
   return (
@@ -82,7 +76,6 @@ const UpdateDictionary = (props: any) => {
           label="编码"
           width="lg"
           name="V_CODE"
-          disabled={dictionary !== undefined}
           rules={[
             {
               required: false,
@@ -107,8 +100,9 @@ const UpdateDictionary = (props: any) => {
           label="排序"
           width="lg"
           name="I_ORDER"
-          //min={0}
+          min={1}
           //max={99999}
+          initialValue={1}
           fieldProps={{precision: 0}}// 小数位数
           rules={[
             {
@@ -141,46 +135,8 @@ const UpdateDictionary = (props: any) => {
             }
           ]}
         />
-        <ProFormDatePicker
-          label="创建时间"
-          width="lg"
-          name="D_DATE_CREATE"
-          rules={[
-            {
-              required: false,
-              message: '创建时间为必填项'
-            }
-          ]}
-        />
       </ProForm.Group>
-      <ProForm.Group>
-        <ProFormDatePicker
-          label="最后修改时间"
-          width="lg"
-          name="D_DATE_EDIT"
-          rules={[
-            {
-              required: false,
-              message: '最后修改时间为必填项'
-            }
-          ]}
-        />
-        <ProFormText
-          label="最后修改人"
-          width="lg"
-          name="V_PER_EDIT"
-          rules={[
-            {
-              required: false,
-              message: '最后修改人为必填项'
-            }
-          ]}
-        />
-      </ProForm.Group>
-
     </ModalForm>
   );
 };
 export default UpdateDictionary;
-
-
