@@ -3,7 +3,6 @@ import React from 'react';
 import { useModel } from 'umi';
 import Avatar from './AvatarDropdown';
 import styles from './index.less';
-import NoticeIconView from "@/components/NoticeIcon";
 
 export type SiderTheme = 'light' | 'dark';
 
