@@ -28,7 +28,7 @@ const UpdateDictionary = (props: any) => {
     if (dictionaryId !== undefined) {
       initDictionary();
     } else {
-
+      formObj.setFieldsValue({I_ORDER: 1});
     }
   }, []);
 
@@ -45,7 +45,7 @@ const UpdateDictionary = (props: any) => {
       response = await updateDictionary({I_ID: (dictionary as any).I_ID, ...newFields});
     }
     hide();
-    if (response.success) {
+    if (response && response.success) {
       message.success("操作成功");
     } else {
       return false;
@@ -78,7 +78,7 @@ const UpdateDictionary = (props: any) => {
           name="V_CODE"
           rules={[
             {
-              required: false,
+              required: true,
               message: '编码为必填项'
             }
           ]}
@@ -89,7 +89,7 @@ const UpdateDictionary = (props: any) => {
           name="V_NAME"
           rules={[
             {
-              required: false,
+              required: true,
               message: '名称为必填项'
             }
           ]}
@@ -102,7 +102,6 @@ const UpdateDictionary = (props: any) => {
           name="I_ORDER"
           min={1}
           //max={99999}
-          initialValue={1}
           fieldProps={{precision: 0}}// 小数位数
           rules={[
             {
@@ -117,7 +116,7 @@ const UpdateDictionary = (props: any) => {
           name="V_DICTIONARYTYPE"
           rules={[
             {
-              required: false,
+              required: true,
               message: '字典分类为必填项'
             }
           ]}

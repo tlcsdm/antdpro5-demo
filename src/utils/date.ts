@@ -14,7 +14,7 @@ const dateFilter = (date: number): string => {
 export const getDate = (): string => {
   let dateObj = new Date();      //表示当前系统时间的Date对象
   let year = dateObj.getFullYear(); //当前系统时间的完整年份值
-  let month = dateObj.getMonth(); //当前系统时间的月份值
+  let month = dateObj.getMonth() + 1; //当前系统时间的月份值
   let date = dateObj.getDate(); //当前系统时间的月份中的日
   return dateFilter(year) + "-" + dateFilter(month) + "-" + dateFilter(date);
 };
@@ -38,4 +38,14 @@ export const getWeek = (): string => {
   let day = dateObj.getDay(); //当前系统时间中的星期值
   let weeks = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
   return weeks[day]; //根据星期值，从数组中获取对应的星期字符串
+};
+
+/*
+ * 获得当月第一天日期
+ */
+export const getMonthFirstDay = (): string => {
+  let dateObj = new Date();      //表示当前系统时间的Date对象
+  let year = dateObj.getFullYear(); //当前系统时间的完整年份值
+  let month = dateObj.getMonth() + 1; //当前系统时间的月份值
+  return dateFilter(year) + "-" + dateFilter(month) + "-" + dateFilter(1);
 };

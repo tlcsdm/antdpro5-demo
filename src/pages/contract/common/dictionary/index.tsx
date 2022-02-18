@@ -1,7 +1,7 @@
 import {PlusOutlined} from '@ant-design/icons';
 import {Button, message, Popconfirm} from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
-import {PageHeaderWrapper} from '@ant-design/pro-layout';
+import {PageContainer} from '@ant-design/pro-layout';
 import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
 import 'moment/locale/zh-cn'
 import UpdateDictionary from "./components/UpdateDictionary";
@@ -32,12 +32,14 @@ const Applications: React.FC = () => {
   const handleRemove = async (id: any) => {
     if (!id) return true;
     const hide = message.loading('正在删除');
-    await deleteDictionary({
+    const req = await deleteDictionary({
       I_ID: id
     });
     hide();
-    message.success('删除成功，即将刷新');
-    actionRef.current?.reloadAndRest?.(); //刷新Protable
+    if (req && req.success) {
+      message.success('删除成功，即将刷新');
+      actionRef.current?.reloadAndRest?.(); //刷新Protable
+    }
     return true;
   };
 
@@ -73,11 +75,11 @@ const Applications: React.FC = () => {
       hideInSearch: true,
       hideInTable: false
     }, {
-      title: '排序',
+      title: '显示顺序',
       dataIndex: 'I_ORDER',
-      width: 150,
+      width: 80,
       hideInSearch: true,
-      hideInTable: true
+      hideInTable: false
     }, {
       title: '创建时间',
       dataIndex: 'D_DATE_CREATE',
@@ -105,7 +107,7 @@ const Applications: React.FC = () => {
       valueType: 'option',  //操作列的类型
       render: (_, record) => [   //render渲染 record代表当前行
         <a key={record.I_ID} onClick={() => isShowModal(true, record.I_ID)}>编辑</a>,
-        <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={(e) => {
+        <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
           handleRemove(record.I_ID)
         }}>
           <a href="#">删除</a>
@@ -114,19 +116,9 @@ const Applications: React.FC = () => {
     }
   ];
 
-  const routes = [
-    {
-      path: '',
-      breadcrumbName: '系统设置'
-    }, {
-      path: '',
-      breadcrumbName: '字典管理'
-    }
-  ];
-
   return (
     // 布局标签
-    <PageHeaderWrapper className="site-page-header" title="字典" breadcrumb={{routes}}>
+    <PageContainer title={false} ghost>
       <ProTable
         columns={columns}// 上面定义的表格列
         headerTitle="字典列表" // 表头
@@ -181,7 +173,7 @@ const Applications: React.FC = () => {
           />
         )
       }
-    </PageHeaderWrapper>
+    </PageContainer>
   );
 };
 

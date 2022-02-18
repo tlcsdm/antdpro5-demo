@@ -1,6 +1,6 @@
-import { Space } from 'antd';
+import {Space} from 'antd';
 import React from 'react';
-import { useModel } from 'umi';
+import {useModel} from 'umi';
 import Avatar from './AvatarDropdown';
 import styles from './index.less';
 

@@ -9,12 +9,12 @@
 export default {
   dev: {
     // localhost:8000/api/** -> https://preview.pro.ant.design/api/**
-    // '/api/contract-system/': {
-    //   //target: 'http://10.18.2.118:8092',
-    //   target: 'http://10.18.2.127:8201',
-    //   changeOrigin: true,
-    //   pathRewrite: {'^/api/contract-system': ''},
-    // },
+    '/api/contract-system/': {
+      //target: 'http://10.18.2.118:8092',
+      target: 'http://10.18.2.127:8201',
+      changeOrigin: true,
+      pathRewrite: {'^/api/contract-system': ''},
+    },
     '/api/': {
       target: 'http://10.18.2.118:8092',
       changeOrigin: true,

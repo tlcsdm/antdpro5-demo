@@ -6,6 +6,7 @@ import {Context, extend} from 'umi-request';
 import {notification} from 'antd';
 import {uuid} from "@/utils/uuid";
 import Qs from "qs";
+import Cookies from 'js-cookie'
 
 /**
  * 异常处理程序
@@ -13,14 +14,15 @@ import Qs from "qs";
  */
 const errorHandler = (error: any) => {
   const {response} = error;
-  // if (response && !response.success) {
-  //   const errorText = response.message;
-  //   notification.error({
-  //     message: '请求错误:',
-  //     description: errorText,
-  //   });
-  // }
-
+  if (response && !response.ok) {
+    const status = response.status;
+    const statusText = response.statusText;
+    const url = response.url;
+    notification.error({
+      message: '请求错误:' + status,
+      description: statusText + '\n' + '错误路径:' + url
+    });
+  }
   return response;
 };
 
@@ -33,13 +35,15 @@ const request = extend({
 // request拦截器, 改变url 或 options.
 // @ts-ignore
 request.interceptors.request.use(async (url, options) => {
-  //拦截request全局加入V_PERCODE值
-  const person = {V_PERCODE: 'admin'};
-  if (options.method === 'get') {
-    options.params = {...options.params, ...person};
-  } else {
-    const newFields = {...Qs.parse(options.data), ...person};
-    options.data = Qs.stringify(newFields);
+  //拦截request全局加入V_PERCODE值 登录除外
+  if (url !== '/api/contract-system/login') {
+    const person = {V_PERCODE: Cookies.get('V_PERCODE') ? Cookies.get('V_PERCODE') : ''};
+    if (options.method === 'get') {
+      options.params = {...options.params, ...person};
+    } else {
+      const newFields = {...Qs.parse(options.data), ...person};
+      options.data = Qs.stringify(newFields);
+    }
   }
   let id = uuid();
   const headers = {
