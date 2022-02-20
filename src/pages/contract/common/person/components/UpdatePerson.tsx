@@ -6,10 +6,7 @@ import {insertPerson, loadPerson, updatePerson} from "@/services/contract/common
 import {yesNoOpinion} from "@/utils/enum";
 
 const UpdatePerson = (props: any) => {
-  const {isModalVisible} = props; // 模态框是否显示
-  const {isShowModal} = props; // 操作模态框显示隐藏的方法
-  const {actionRef} = props; // 父组件传过来的表格的引用, 可以用来操作表格, 比如刷新表格
-  const {personId} = props; // 要编辑的ID, 添加的时候是undefined, 只有编辑才有
+  const {isModalVisible, isShowModal, actionRef, personId} = props;
   const [person, setPerson] = useState(undefined);// 将表单初始化的值设置成状态, 在编辑的时候, 使用这个状态
   const [formObj] = ProForm.useForm(); // 定义Form实例, 用来操作表单
 
@@ -18,8 +15,6 @@ const UpdatePerson = (props: any) => {
     const response = await loadPerson({I_ID: personId});
     const personData = response.data;
     setPerson({...response.data});
-    Object.keys(personData);
-    Object.values(personData);
     Object.keys(personData).forEach(key => formObj.setFieldsValue({[`${key}`]: personData[key]}));
   };
 

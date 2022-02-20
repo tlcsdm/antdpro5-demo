@@ -11,11 +11,7 @@ import {ProFormInstance} from "@ant-design/pro-form";
 const PreChooseDictionaryMultiple = (props: any) => {
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
-  const {isDictionaryModalVisible} = props; // 模态框是否显示
-  const {isShowDictionaryModal} = props; // 操作模态框显示隐藏的方法
-  const {setDictionaryList} = props;
-  const {dictionaryType} = props;
-  const {dictDataSource} = props;
+  const {isDictionaryModalVisible, isShowDictionaryModal, setDictionaryList, dictionaryType, dictDataSource} = props;
 
   const handleCancel = () => {
     isShowDictionaryModal(false);

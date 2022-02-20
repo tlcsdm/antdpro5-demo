@@ -7,10 +7,7 @@ import ProList from "@ant-design/pro-list";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const PreChooseDictionary = (props: any) => {
-  const {isDictionaryModalVisible} = props; // 模态框是否显示
-  const {isShowDictionaryModal} = props; // 操作模态框显示隐藏的方法
-  const {setDictionary} = props;
-  const {dictionaryType} = props;
+  const {isDictionaryModalVisible, isShowDictionaryModal, setDictionary, dictionaryType} = props; // 模态框是否显示
 
   const handleCancel = () => {
     isShowDictionaryModal(false);

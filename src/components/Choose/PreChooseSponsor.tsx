@@ -7,9 +7,7 @@ import {Button} from "antd";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const PreChooseSponsor = (props: any) => {
-  const {isSponsorModalVisible} = props; // 模态框是否显示
-  const {isShowSponsorModal} = props; // 操作模态框显示隐藏的方法
-  const {setSponsor} = props;
+  const {isSponsorModalVisible, isShowSponsorModal, setSponsor} = props;
 
   const handleCancel = () => {
     isShowSponsorModal(false);

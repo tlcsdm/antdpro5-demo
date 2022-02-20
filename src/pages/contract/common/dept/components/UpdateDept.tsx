@@ -7,11 +7,7 @@ import {deptTypeOpinion, dqOpinion, yesNoOpinion} from "@/utils/enum";
 
 const UpdateDept = (props: any) => {
   const [formObj] = ProForm.useForm();// 定义Form实例, 用来操作表单
-  const {isDeptModalVisible} = props; // 模态框是否显示
-  const {isShowDeptModal} = props; // 操作模态框显示隐藏的方法
-  const {editId} = props;
-  const {treeKey} = props;
-  const {title} = props;
+  const {isDeptModalVisible, isShowDeptModal, editId, treeKey, title} = props;
   const type = editId == '' ? '新增' : '修改';
   const [initialValues, setInitialValues] = useState(undefined);
 

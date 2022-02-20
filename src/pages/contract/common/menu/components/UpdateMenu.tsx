@@ -7,11 +7,7 @@ import {iconOpinion} from "@/utils/iconMap";
 
 const UpdateMenu = (props: any) => {
   const [formObj] = ProForm.useForm();// 定义Form实例, 用来操作表单
-  const {isMenuModalVisible} = props; // 模态框是否显示
-  const {isShowMenuModal} = props; // 操作模态框显示隐藏的方法
-  const {editId} = props;
-  const {treeKey} = props;
-  const {title} = props;
+  const {isMenuModalVisible,isShowMenuModal,editId,treeKey,title} = props;
   const type = editId == '' ? '新增' : '修改';
   const [initialValues, setInitialValues] = useState(undefined);
   // const [dataSource, setDataSource] = useState([]);

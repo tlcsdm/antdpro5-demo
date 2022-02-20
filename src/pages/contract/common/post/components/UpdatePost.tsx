@@ -7,11 +7,7 @@ import {yesNoDigitOpinion} from "@/utils/enum";
 
 const UpdatePost = (props: any) => {
   const [formObj] = ProForm.useForm();// 定义Form实例, 用来操作表单
-  const {isPostModalVisible} = props; // 模态框是否显示
-  const {isShowPostModal} = props; // 操作模态框显示隐藏的方法
-  const {editId} = props;
-  const {treeKey} = props;
-  const {title} = props;
+  const {isPostModalVisible, isShowPostModal, editId, treeKey, title} = props; // 模态框是否显示
   const type = editId == '' ? '新增' : '修改';
   const [initialValues, setInitialValues] = useState(undefined);
 

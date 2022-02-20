@@ -153,11 +153,22 @@
         access: 'hasRoute',
       },
       {
-        name: '日志查询',
+        name: '日志管理',
         icon: 'container',
         path: '/system/log',
-        component: './contract/common/log',
         access: 'hasRoute',
+        routes: [
+          {
+            name: '操作日志',
+            icon: 'container',
+            path: '/system/log/operlog',
+            access: 'hasRoute',
+            component: './contract/common/log',
+          },
+          {
+            component: './404',
+          },
+        ],
       },
       {
         name: '机构人员岗位管理',

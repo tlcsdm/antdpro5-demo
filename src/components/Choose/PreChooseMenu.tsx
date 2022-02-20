@@ -3,12 +3,9 @@ import {Button, Drawer, Space, Spin, Tree} from 'antd';
 import {selectMenuTree} from '@/services/contract/common/menu';
 
 const PreChooseMenu = (props: any) => {
-  const {isMenuModalVisible} = props; // 模态框是否显示
-  const {isShowMenuModal} = props; // 操作模态框显示隐藏的方法
+  const {isMenuModalVisible, isShowMenuModal, setMenuList, menuDataSource} = props; // 模态框是否显示
   const [treeData, setTreeData] = useState([]);
   const [checkedKeys, setCheckedKeys] = useState([]);
-  const {setMenuList} = props;
-  const {menuDataSource} = props;
 
   // @ts-ignore
   useEffect(async () => {

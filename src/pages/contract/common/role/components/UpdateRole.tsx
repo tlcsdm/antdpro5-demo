@@ -5,10 +5,7 @@ import 'antd/dist/antd.min.css';
 import {insertRole, loadRole, updateRole} from "@/services/contract/common/role";
 
 const UpdateRole = (props: any) => {
-  const {isModalVisible} = props; // 模态框是否显示
-  const {isShowModal} = props; // 操作模态框显示隐藏的方法
-  const {actionRef} = props; // 父组件传过来的表格的引用, 可以用来操作表格, 比如刷新表格
-  const {roleId} = props; // 要编辑的ID, 添加的时候是undefined, 只有编辑才有
+  const {isModalVisible, isShowModal, actionRef, roleId} = props;
   const [role, setRole] = useState(undefined);// 将表单初始化的值设置成状态, 在编辑的时候, 使用这个状态
   const [formObj] = ProForm.useForm(); // 定义Form实例, 用来操作表单
 
@@ -16,10 +13,7 @@ const UpdateRole = (props: any) => {
   const initRole = async () => {
     const response = await loadRole({I_ID: roleId});
     const roleData = response.data;
-
     setRole({...response.data});
-    Object.keys(roleData);
-    Object.values(roleData);
     Object.keys(roleData).forEach(key => formObj.setFieldsValue({[`${key}`]: roleData[key]}));
   };
 

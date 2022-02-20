@@ -11,10 +11,7 @@ import {selectRole} from "@/services/contract/common/role";
 const PreChooseRole = (props: any) => {
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
-  const {isRoleModalVisible} = props; // 模态框是否显示
-  const {isShowRoleModal} = props; // 操作模态框显示隐藏的方法
-  const {setRoleList} = props;
-  const {roleDataSource} = props;
+  const {isRoleModalVisible, isShowRoleModal, setRoleList, roleDataSource} = props;
 
   const handleCancel = () => {
     isShowRoleModal(false);

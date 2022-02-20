@@ -6,10 +6,7 @@ import {insertContractor, loadContractor, updateContractor} from "@/services/con
 import {creditOpinion} from "@/utils/enum";
 
 const UpdateContractor = (props: any) => {
-  const {isModalVisible} = props; // 模态框是否显示
-  const {isShowModal} = props; // 操作模态框显示隐藏的方法
-  const {actionRef} = props; // 父组件传过来的表格的引用, 可以用来操作表格, 比如刷新表格
-  const {contractorId} = props; // 要编辑的ID, 添加的时候是undefined, 只有编辑才有
+  const {isModalVisible, isShowModal, actionRef, contractorId} = props; // 模态框是否显示
   const [contractor, setContractor] = useState(undefined);// 将表单初始化的值设置成状态, 在编辑的时候, 使用这个状态
   const [formObj] = ProForm.useForm(); // 定义Form实例, 用来操作表单
 
@@ -17,10 +14,7 @@ const UpdateContractor = (props: any) => {
   const initContractor = async () => {
     const response = await loadContractor({I_ID: contractorId});
     const contractorData = response.data;
-
     setContractor({...response.data});
-    Object.keys(contractorData);
-    Object.values(contractorData);
     Object.keys(contractorData).forEach(key => formObj.setFieldsValue({[`${key}`]: contractorData[key]}));
   };
 

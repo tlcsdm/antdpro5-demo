@@ -7,9 +7,7 @@ import ProDescriptions from "@ant-design/pro-descriptions";
 import {statusEnum} from "@/utils/enum";
 
 const ViewPerson = (props: any) => {
-  const {isViewPersonModalVisible} = props; // 模态框是否显示
-  const {isPersonShowModal} = props; // 操作模态框显示隐藏的方法
-  const {personId} = props;
+  const {isViewPersonModalVisible, isPersonShowModal, personId} = props;
 
   const handleCancel = () => {
     isPersonShowModal(false);

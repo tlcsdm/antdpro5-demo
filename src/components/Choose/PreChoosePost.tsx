@@ -3,10 +3,7 @@ import {Button, Drawer, Space, Spin, Tree} from 'antd';
 import {selectPostTree} from "@/services/contract/common/post";
 
 const PreChoosePost = (props: any) => {
-  const {isUserPostModalVisible} = props; // 模态框是否显示
-  const {isShowUserPostModal} = props; // 操作模态框显示隐藏的方法
-  const {postDataSource} = props;
-  const {setPostList} = props;
+  const {isUserPostModalVisible, isShowUserPostModal, postDataSource, setPostList} = props;
   const [treeData, setTreeData] = useState([]);
   const [checkedKeys, setCheckedKeys] = useState([]);
 
@@ -45,7 +42,7 @@ const PreChoosePost = (props: any) => {
 
   return (
     <Drawer
-      title={'选择岗位树'}
+      title={'选择岗位'}
       visible={isUserPostModalVisible} //设置显示或隐藏
       onClose={() => isShowUserPostModal(false)} //取消/关闭触发
       width={446}

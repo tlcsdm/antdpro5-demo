@@ -10,9 +10,7 @@ import {selectPerToContractor} from "@/services/contract/person/perToContractor"
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const PreChooseContractor = (props: any) => {
-  const {isContractorModalVisible} = props; // 模态框是否显示
-  const {isShowContractorModal} = props; // 操作模态框显示隐藏的方法
-  const {setContractor} = props;
+  const {isContractorModalVisible, isShowContractorModal, setContractor} = props;
   const [tabKey, setTabKey] = useState('PerToContractorTab');
   const contractorActionRef = useRef<ActionType>();
   const perToContractorActionRef = useRef<ActionType>();

@@ -11,10 +11,7 @@ import {CheckOutlined} from "@ant-design/icons/lib";
 const PreChoosePerson = (props: any) => {
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
-  const {isUserModalVisible} = props; // 模态框是否显示
-  const {isShowUserModal} = props; // 操作模态框显示隐藏的方法
-  const {setPersonList} = props;
-  const {personDataSource} = props;
+  const {isUserModalVisible, isShowUserModal, setPersonList, personDataSource} = props;
 
   const handleCancel = () => {
     isShowUserModal(false);

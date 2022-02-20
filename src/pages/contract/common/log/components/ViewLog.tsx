@@ -7,9 +7,7 @@ import ProDescriptions from "@ant-design/pro-descriptions";
 import {successEnum} from "@/utils/enum";
 
 const ViewLog = (props: any) => {
-  const {isModalVisible} = props; // 模态框是否显示
-  const {isShowModal} = props; // 操作模态框显示隐藏的方法
-  const {logId} = props;
+  const {isModalVisible, isShowModal, logId} = props; // 模态框是否显示
 
   const handleCancel = () => {
     isShowModal(false);

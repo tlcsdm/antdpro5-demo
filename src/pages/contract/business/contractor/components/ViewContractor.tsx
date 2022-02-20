@@ -6,9 +6,7 @@ import {loadContractor} from '@/services/contract/business/contractor';
 import ProDescriptions from '@ant-design/pro-descriptions';
 
 const ViewContractor = (props: any) => {
-  const {isViewContractorModalVisible} = props; // 模态框是否显示
-  const {isContractorShowModal} = props; // 操作模态框显示隐藏的方法
-  const {contractorId} = props;
+  const {isViewContractorModalVisible, isContractorShowModal, contractorId} = props;
 
   const handleCancel = () => {
     isContractorShowModal(false);
