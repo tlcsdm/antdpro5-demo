@@ -2,7 +2,7 @@
  * request 网络请求工具
  * 更详细的 api 文档: https://github.com/umijs/umi-request
  */
-import {Context, extend} from 'umi-request';
+import {Context, extend, RequestOptionsInit} from 'umi-request';
 import {notification} from 'antd';
 import {uuid} from "@/utils/uuid";
 import Qs from "qs";
@@ -63,10 +63,14 @@ request.interceptors.request.use(async (url, options) => {
 //   return response;
 // });
 
+//忽略数据结果处理的路径
+const igoreUrls: string [] = ['/api/contract-system/login'];
+
 //全局处理请求结果异常
 // @ts-ignore
-request.interceptors.response.use(async (response) => {
+request.interceptors.response.use(async (response, options: RequestOptionsInit) => {
   try {
+    if (igoreUrls.includes(options.url)) return response;
     const data = await response.clone().json();
     if (data && data.status === 404) {
       notification.error({

@@ -26,7 +26,7 @@ const LoginMessage: React.FC<{
 );
 
 const Login: React.FC = () => {
-  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
+  const [userLoginState, setUserLoginState] = useState<API.LoginResult>({success: true});
   const [type, setType] = useState<string>('account');
   const {setInitialState} = useModel('@@initialState');
 
@@ -68,9 +68,10 @@ const Login: React.FC = () => {
       // 如果失败去设置用户错误信息
       setUserLoginState(msg);
     } catch (error) {
+      message.error('登录失败，请重试！');
     }
   };
-  const {success, message: msg, type: loginType} = userLoginState;
+  const {success, message: msg} = userLoginState;
 
   return (
     <div className={styles.container}>
@@ -108,7 +109,7 @@ const Login: React.FC = () => {
             />
           </Tabs>
 
-          {!success && loginType === 'account' && (
+          {!success && type === 'account' && (
             <LoginMessage
               content={`${msg}`}
             />
