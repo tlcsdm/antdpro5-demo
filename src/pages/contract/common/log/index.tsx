@@ -8,6 +8,7 @@ import {selectLog} from '@/services/contract/common/log';
 import {getDate, getMonthFirstDay} from '@/utils/date';
 import {Button} from "antd";
 import {successEnum} from "@/utils/enum";
+import Cookies from "js-cookie";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
@@ -225,9 +226,10 @@ const Applications: React.FC = () => {
                   '&V_URL=' + encodeURIComponent(formProps.form?.getFieldValue('V_URL') ? formProps.form?.getFieldValue('V_URL') : '') +
                   '&V_PARAMS=' + encodeURIComponent(formProps.form?.getFieldValue('V_PARAMS') ? formProps.form?.getFieldValue('V_PARAMS') : '') +
                   '&I_TRACEID=' + encodeURIComponent(formProps.form?.getFieldValue('I_TRACEID') ? formProps.form?.getFieldValue('I_TRACEID') : '') +
-                  '&START_DATE=' + encodeURIComponent((typeof (formProps.form?.getFieldValue('START_DATE')) == 'string') ? formProps.form?.getFieldValue('START_DATE') : formProps.form?.getFieldValue('START_DATE').format('YYYY-MM-DD')) +
-                  '&END_DATE=' + encodeURIComponent((typeof (formProps.form?.getFieldValue('END_DATE')) == 'string') ? formProps.form?.getFieldValue('END_DATE') : formProps.form?.getFieldValue('END_DATE').format('YYYY-MM-DD')) +
-                  '&V_PROVERSION=' + encodeURIComponent(formProps.form?.getFieldValue('V_PROVERSION') ? formProps.form?.getFieldValue('V_PROVERSION') : '');
+                  '&START_DATE=' + encodeURIComponent((typeof (formProps.form?.getFieldValue('V_CREATETIME')[0]) == 'string') ? formProps.form?.getFieldValue('V_CREATETIME')[0] : formProps.form?.getFieldValue('V_CREATETIME')[0].format('YYYY-MM-DD')) +
+                  '&END_DATE=' + encodeURIComponent((typeof (formProps.form?.getFieldValue('V_CREATETIME')[1]) == 'string') ? formProps.form?.getFieldValue('V_CREATETIME')[1] : formProps.form?.getFieldValue('V_CREATETIME')[1].format('YYYY-MM-DD')) +
+                  '&V_PROVERSION=' + encodeURIComponent(formProps.form?.getFieldValue('V_PROVERSION') ? formProps.form?.getFieldValue('V_PROVERSION') : '') +
+                  '&V_PERCODE=' + Cookies.get('V_PERCODE');
               }}>
               导出
             </Button>

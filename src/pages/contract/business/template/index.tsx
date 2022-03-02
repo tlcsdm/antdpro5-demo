@@ -4,79 +4,75 @@ import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
 import 'moment/locale/zh-cn'
-import UpdatePerson from "./components/UpdatePerson";
+import UpdateTemplate from "./components/UpdateTemplate";
 import {ProFormInstance} from '@ant-design/pro-form';
-import {deletePerson, initPersonPassWord, selectPerson, updatePersonStatus} from "@/services/contract/common/person";
+import {deleteTemplate, selectTemplate, updateTemplateStatus} from "@/services/contract/business/template";
+import {selectTemplateType} from "@/services/contract/business/templateType";
 import {statusEnum} from "@/utils/enum";
-import ViewPerson from "@/pages/contract/common/person/components/ViewPerson";
+import Cookies from "js-cookie";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isViewPersonModalVisible, setIsViewPersonModalVisible] = useState(false);
-  const [personId, setPersonId] = useState(undefined);
+  const [templateId, setTemplateId] = useState(undefined);
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
+  const [templateTypeList, setTemplateTypeList] = useState([]);//模板类型
 
   /**
    * 控制模态框显示和隐藏
    */
   const isShowModal = (show: boolean | ((prevState: boolean) => boolean), id = undefined) => {
-    setPersonId(id);
+    setTemplateId(id);
     setIsModalVisible(show);
   };
 
-  /**
-   * 查看模态框显示和隐藏
-   */
-  const isPersonShowModal = (show: boolean | ((prevState: boolean) => boolean), id = undefined) => {
-    setPersonId(id);
-    setIsViewPersonModalVisible(show);
+  //查询模板类型
+  const initTemplateType = async () => {
+    // 这里异步请求后台将数据拿到
+    const response = await selectTemplateType({V_STATUS: '1'});
+    const templateTempList: any = [];
+    response.data.forEach(function (item: any) {
+      const tempTemplateDetail: any = {value: item.I_ID, label: item.V_NAME};
+      templateTempList.push(tempTemplateDetail);
+    });
+    setTemplateTypeList(templateTempList);
+    formRef.current?.setFieldsValue?.({V_TYPEID: ''});
   };
 
   //useEffect参数为空数组时仅初始化执行一次
   useEffect(() => {
-
+    initTemplateType();
   }, []);
 
-  //修改状态
-  const updateStatus = async (id: any, V_STATUS: string, status: any) => {
-    if (V_STATUS === status) return;
-    const rep = await updatePersonStatus({I_ID: id, V_STATUS: status});
-    if (rep && rep.success) {
-      message.success('操作成功');
-      actionRef.current?.reloadAndRest?.();
-    }
-  };
-
-  //删除人员
-  const handleRemove = async (id: any) => {
+  //删除合同模版
+  const handleRemove = async (id: any, V_URL: any) => {
     if (!id) return true;
     const hide = message.loading('正在删除');
-    const req = await deletePerson({
-      I_ID: id
+    await deleteTemplate({
+      I_ID: id,
+      V_URL: V_URL
     });
     hide();
-    if (req && req.success) {
-      message.success('删除成功，即将刷新');
-      actionRef.current?.reloadAndRest?.(); //刷新Protable
-    }
+    message.success('删除成功，即将刷新');
+    actionRef.current?.reloadAndRest?.(); //刷新Protable
     return true;
   };
 
-  //初始化密码
-  const initPasswd = async (id: any) => {
-    if (!id) return true;
-    const hide = message.loading('正在初始化密码');
-    const req = await initPersonPassWord({
-      I_ID: id,
-      V_PASSWORD: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92'
-    });
-    hide();
-    if (req && req.success) {
-      message.success('初始化密码成功');
+  //修改合同模版状态
+  const updateStatus = async (id: any, V_STATUS: string, status: any) => {
+    if (V_STATUS === status) return;
+    const rep = await updateTemplateStatus({I_ID: id, V_STATUS: status});
+    if (rep && rep.success) {
+      message.success('操作成功');
+      actionRef.current?.reloadAndRest?.(); //刷新Protable
     }
-    return true;
+  };
+
+  //下载模板
+  const downloadTemplate = async (id: any, V_URL: any, V_FILENAME: any) => {
+    window.location.href = '/api/contract-system/downloadTemplate?I_ID=' + id + '&V_PERCODE=' + Cookies.get('V_PERCODE') +
+      '&V_URL=' + encodeURIComponent(V_URL) + '&V_FILENAME=' + encodeURIComponent(V_FILENAME);
   };
 
   const columns: ProColumns[] = [  //定义 Protable的列 columns放在Protable
@@ -87,84 +83,71 @@ const Applications: React.FC = () => {
       hideInTable: false,
       render: (text, record, index) => `${index + 1}`
     }, {
-      title: '人员编码',
-      dataIndex: 'V_PERCODE',
-      width: 100,
-      hideInSearch: false,
-      hideInTable: false,
-      render: (_, record) => [
-        <a key={record.I_ID} onClick={() => isPersonShowModal(true, record.I_ID)}>{_}</a>
-      ],
-    }, {
-      title: '人员姓名',
-      dataIndex: 'V_PERNAME',
-      width: 100,
-      hideInSearch: false,
-      hideInTable: false
-    }, {
-      title: '人员登陆名',
-      dataIndex: 'V_LOGINNAME',
-      width: 100,
-      hideInSearch: true,
-      hideInTable: false
-    }, {
-      title: '员工号',
-      dataIndex: 'V_YGCODE',
-      width: 100,
-      hideInSearch: true,
-      hideInTable: false
-    }, {
-      title: '单位电话',
-      dataIndex: 'V_TEL',
+      title: '模板类型',
+      dataIndex: 'V_TYPEID',
       width: 150,
-      hideInSearch: true,
+      valueType: 'select',
+      fieldProps: {
+        options: templateTypeList,
+        onChange() {
+          formRef.current?.submit();
+        }
+      },
+      hideInSearch: false,
       hideInTable: false
-    }, {
-      title: '联系电话',
-      dataIndex: 'V_LXDH_CLF',
-      width: 100,
-      hideInSearch: true,
-      hideInTable: false
-    }, {
-      title: '最后登录时间',
-      dataIndex: 'D_DATE_LOGIN',
-      valueType: 'dateTime',
-      width: 120,
-      hideInSearch: true,
+    },
+    {
+      title: '模版名称',
+      dataIndex: 'V_NAME',
+      width: 150,
+      hideInSearch: false,
       hideInTable: false
     }, {
       title: '状态',
       dataIndex: 'V_STATUS',
-      width: 50,
+      width: 100,
       hideInSearch: false,
       hideInTable: false,
-      valueEnum: statusEnum,
+      valueEnum: statusEnum
     }, {
-      title: '显示排序',
-      dataIndex: 'I_ORDER',
-      width: 80,
+      title: '模板查看',
+      width: 100,
       hideInSearch: true,
-      hideInTable: false
+      valueType: 'option',  //操作列的类型
+      render: (_, record) => [   //render渲染 record代表当前行
+        <a key={record.I_ID} /*onClick={() => isViewShowModal(true, record.I_ID)}*/>查看</a>,
+      ]
     }, {
       title: '操作',
-      width: 200,
+      width: 150,
       hideInSearch: true,
       valueType: 'option',  //操作列的类型
       render: (_, record) => [   //render渲染 record代表当前行
         <a key={record.I_ID} onClick={() => isShowModal(true, record.I_ID)}>编辑</a>,
-        <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '1')}>启用</a>,
-        <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '0')}>停用</a>,
+        <Popconfirm key={record.I_ID} title="确认启用？" okText="确认" cancelText="取消" onConfirm={(e) => {
+          updateStatus(record.I_ID, record.V_STATUS, '1');
+        }}>
+          <a href="#">启用</a>
+        </Popconfirm>,
+        <Popconfirm key={record.I_ID} title="确认停用？" okText="确认" cancelText="取消" onConfirm={(e) => {
+          updateStatus(record.I_ID, record.V_STATUS, '0');
+        }}>
+          <a href="#">停用</a>
+        </Popconfirm>,
         <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={(e) => {
-          handleRemove(record.I_ID)
+          handleRemove(record.I_ID, record.V_URL);
         }}>
           <a href="#">删除</a>
         </Popconfirm>,
-        <Popconfirm key={record.I_ID} title="确认初始化密码为123456？" okText="确认" cancelText="取消" onConfirm={(e) => {
-          initPasswd(record.I_ID)
-        }}>
-          <a href="#">初始化密码</a>
-        </Popconfirm>
+        <a key={record.I_ID} onClick={() => downloadTemplate(record.I_ID, record.V_URL, record.V_FILENAME)}>下载</a>
       ]
+    }, {
+      title: '最后修改时间',
+      dataIndex: 'D_DATE_EDIT',
+      valueType: 'dateTime',
+      width: 150,
+      hideInSearch: true,
+      hideInTable: false
     }
   ];
 
@@ -173,7 +156,7 @@ const Applications: React.FC = () => {
     <PageContainer title={false} ghost>
       <ProTable
         columns={columns}// 上面定义的表格列
-        headerTitle="人员列表" // 表头
+        headerTitle="合同模版列表" // 表头
         actionRef={actionRef} // 用于触发刷新操作等，看api
         formRef={formRef}
         rowKey="I_ID"// 表格行 key 的取值，可以是字符串或一个函数
@@ -206,10 +189,8 @@ const Applications: React.FC = () => {
         }}
         request={async (params) => {   //调用请求加载表格数据， 默认自动加载 params为Search的查询条件参数
           const newParams = {};
-          //可对params传参进行进一步处理后再调用查询
           Object.assign(newParams, params);
-          newParams['V_PERCODE_FORM'] = formRef?.current?.getFieldValue('V_PERCODE');
-          return await selectPerson({...newParams});
+          return await selectTemplate({...newParams});
         }}
       />
 
@@ -218,23 +199,11 @@ const Applications: React.FC = () => {
         !isModalVisible ? (
           ''
         ) : (
-          <UpdatePerson
+          <UpdateTemplate
             isModalVisible={isModalVisible}
             isShowModal={isShowModal}
             actionRef={actionRef}
-            personId={personId}
-          />
-        )
-      }
-
-      {
-        !isViewPersonModalVisible ? (
-          ''
-        ) : (
-          <ViewPerson
-            isViewPersonModalVisible={isViewPersonModalVisible}
-            isPersonShowModal={isPersonShowModal}
-            personId={personId}
+            templateId={templateId}
           />
         )
       }

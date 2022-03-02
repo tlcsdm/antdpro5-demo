@@ -16,7 +16,7 @@ export default {
       pathRewrite: {'^/api/contract-system': ''},
     },
     '/api/': {
-      target: 'http://10.18.2.118:8092',
+      target: 'http://10.18.26.118:8092',
       changeOrigin: true,
       pathRewrite: {'^/api': ''},
     },

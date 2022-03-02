@@ -158,6 +158,7 @@ const Applications: React.FC = () => {
                     if (selectedKeys.length === 0) return;
                     setTitle(e.node.title);
                     getMajorTable(selectedKeys[0]);
+                    setMajorId('');
                   }}
                   height={700}
                 />
@@ -195,6 +196,7 @@ const Applications: React.FC = () => {
                 key="button"
                 icon={<PlusOutlined/>}
                 type="primary"
+                disabled={(majorId === '')}
                 onClick={() => isShowMajorRoleModal(true)}
               >
                 新建

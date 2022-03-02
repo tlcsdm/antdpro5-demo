@@ -19,7 +19,6 @@
     path: '/personalcenter',
     name: '个人中心',
     icon: 'user',
-    access: 'hasRoute',
     routes: [
       {
         path: '/personalcenter',
@@ -47,14 +46,21 @@
         access: 'hasRoute',
       },
       {
+        name: '修改密码',
+        icon: 'edit',
+        path: '/personalcenter/updatePass',
+        component: './contract/person/password',
+        hideInMenu: true
+      },
+      {
         component: './404',
       },
     ],
   },
   {
     path: '/business',
-    name: '业务设置',
-    icon: 'setting',
+    name: '业务重心',
+    icon: 'desktop',
     access: 'hasRoute',
     routes: [
       {
@@ -93,6 +99,41 @@
         icon: 'team',
         path: '/business/majorToRole',
         component: './contract/business/majorToRole',
+        access: 'hasRoute',
+      },
+      {
+        name: '模板管理',
+        icon: 'container',
+        path: '/business/template',
+        component: './contract/business/template',
+        access: 'hasRoute',
+      },
+      {
+        name: '模板下载',
+        icon: 'container',
+        path: '/business/templateDown',
+        component: './contract/business/templateDown',
+        access: 'hasRoute',
+      },
+      {
+        name: '管理流程定义',
+        icon: 'team',
+        path: '/business/processDefinition',
+        component: './contract/business/processDefinition',
+        access: 'hasRoute',
+      },
+      {
+        name: '合同审查',
+        icon: 'team',
+        path: '/business/review',
+        component: './contract/business/processDefinition',
+        access: 'hasRoute',
+      },
+      {
+        name: '合同履行',
+        icon: 'team',
+        path: '/business/perform',
+        component: './contract/business/processDefinition',
         access: 'hasRoute',
       },
       {
@@ -166,6 +207,13 @@
             component: './contract/common/log',
           },
           {
+            name: '登录日志',
+            icon: 'container',
+            path: '/system/log/loginLog',
+            access: 'hasRoute',
+            component: './contract/common/loginLog',
+          },
+          {
             component: './404',
           },
         ],
@@ -197,6 +245,38 @@
         path: '/system/roleToMenu',
         component: './contract/common/roleToMenu',
         access: 'hasRoute',
+      },
+      {
+        name: '文件上传',
+        icon: 'file',
+        path: '/system/fileUpload',
+        component: './contract/common/fileUpload',
+        access: 'hasRoute',
+      },
+      {
+        name: '系统监控',
+        icon: 'container',
+        path: '/system/monitor',
+        access: 'hasRoute',
+        routes: [
+          {
+            name: '数据监控',
+            icon: 'container',
+            path: '/system/monitor/druid',
+            access: 'hasRoute',
+            component: './contract/common/monitor/druid',
+          },
+          {
+            name: '服务监控',
+            icon: 'container',
+            path: '/system/monitor/service',
+            access: 'hasRoute',
+            component: './contract/common/monitor/service',
+          },
+          {
+            component: './404',
+          },
+        ],
       },
       {
         component: './404',

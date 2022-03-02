@@ -173,6 +173,7 @@ const Applications: React.FC = () => {
                     if (selectedKeys.length === 0) return;
                     setTitle(e.node.title);
                     getPersonTable(selectedKeys[0]);
+                    setPersonCode('');
                   }}
                   height={700}
                 />
@@ -210,6 +211,7 @@ const Applications: React.FC = () => {
                 key="button"
                 icon={<PlusOutlined/>}
                 type="primary"
+                disabled={(personCode === '')}
                 onClick={() => isShowMenuModal(true, false)}
               >
                 新建

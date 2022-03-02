@@ -7,6 +7,10 @@ declare namespace API {
     type CurrentUser = {
         V_PERCODE?: string;
         V_PERNAME?: string;
+        V_DEPTCODE?: string;
+        V_DEPTNAME?: string;
+        V_ORGCODE?: string;
+        V_ORGNAME?: string;
         // userid?: string;
         // email?: string;
         // signature?: string;

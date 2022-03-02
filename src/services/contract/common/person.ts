@@ -50,6 +50,15 @@ export async function updatePersonStatus(params: any) {
   return res;
 }
 
+//初始化人员密码
+export async function initPersonPassWord(params: any) {
+  const res = request('/api/contract-system/initPersonPassWord', {
+    method: 'POST',
+    data: Qs.stringify(params),
+  });
+  return res;
+}
+
 //修改人员密码
 export async function updatePersonPassWord(params: any) {
   const res = request('/api/contract-system/updatePersonPassWord', {

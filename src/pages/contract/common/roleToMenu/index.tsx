@@ -82,8 +82,15 @@ const Applications: React.FC = () => {
 
   const roleColumns: ProColumns[] = [  //定义 Protable的列 columns放在Protable
     {
+      title: '角色编码',
+      dataIndex: 'V_ORLECODE',
+      width: 50,
+      hideInSearch: false,
+      hideInTable: false
+    }, {
       title: '角色名称',
       dataIndex: 'V_ORLENAME',
+      order: 2,
       width: 50,
       hideInSearch: false,
       hideInTable: false
@@ -179,7 +186,7 @@ const Applications: React.FC = () => {
               const newParams = {};
               //可对params传参进行进一步处理后再调用查询
               Object.assign(newParams, params);
-              return await selectRole({...newParams});
+              return await selectRole({...newParams, V_STATUS: '1'});
             }}
           />
         </ProCard>

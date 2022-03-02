@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, message, Popconfirm, Spin, Tree} from 'antd';
+import {Button, message, Popconfirm, Spin, Tree, Upload} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import {selectDeptTree} from '@/services/contract/common/dept';
 import ProCard from '@ant-design/pro-card';
@@ -9,6 +9,8 @@ import {PageContainer} from "@ant-design/pro-layout";
 import PreChoosePerson from "@/components/Choose/PreChoosePerson";
 import {deletePerToRole, insertPerToRoleBatch, selectPerToRole} from "@/services/contract/common/perToRole";
 import PreChooseRole from "@/components/Choose/PreChooseRole";
+import {DownloadOutlined, UploadOutlined} from "@ant-design/icons/lib";
+import Cookies from "js-cookie";
 
 const Applications: React.FC = () => {
   const [isUserModalVisible, setIsUserModalVisible] = useState(false);
@@ -154,6 +156,27 @@ const Applications: React.FC = () => {
     }
   };
 
+  const fileProps = {
+    name: 'multipartFiles',
+    showUploadList: false,
+    data: {
+      V_PERCODE_FORM: personCode,
+      V_PERCODE: (Cookies as any).get('V_PERCODE')
+    },
+    onChange(info: any) {
+      if (info.file.status === 'done') {
+        if (info.file.response.success) {
+          message.success("导入成功");
+          getRoleDataSource(personCode, personName);
+        } else {
+          message.error("导入失败");
+        }
+      } else if (info.file.status === 'error') {
+        message.error("导入失败");
+      }
+    },
+  };
+
   const personColumns: ProColumns[] = [
     {
       title: '序号',
@@ -248,6 +271,7 @@ const Applications: React.FC = () => {
                     setOrgCode(e.node.orgCode);
                     setTitle(e.node.title);
                     getPersonTable(selectedKeys[0]);
+                    setPersonCode('');
                   }}
                   height={700}
                 />
@@ -294,11 +318,25 @@ const Applications: React.FC = () => {
               <Button
                 key="button"
                 icon={<PlusOutlined/>}
+                disabled={(personCode === '')}
                 type="primary"
                 onClick={() => isShowRoleModal(true)}
               >
                 新建
-              </Button>
+              </Button>,
+              <Button
+                icon={<DownloadOutlined/>}
+                key="export"
+                disabled={(personCode === '')}
+                onClick={() => {
+                  window.location.href = '/api/contract-system/exportPerToRole?' +
+                    'V_PERCODE_FORM=' + encodeURIComponent(personCode);
+                }}>
+                导出
+              </Button>,
+              <Upload {...fileProps} action="/api/contract-system/importPerToRole">
+                <Button icon={<UploadOutlined/>} disabled={(personCode === '')}>导入</Button>
+              </Upload>,
             ]}
           />
         </ProCard>

@@ -237,6 +237,7 @@ const Applications: React.FC = () => {
                     setOrgCode(e.node.orgCode);
                     setTitle(e.node.title);
                     getPersonTable(selectedKeys[0]);
+                    setPersonCode('');
                   }}
                   height={700}
                 />
@@ -284,6 +285,7 @@ const Applications: React.FC = () => {
                 key="button"
                 icon={<PlusOutlined/>}
                 type="primary"
+                disabled={(personCode === '')}
                 onClick={() => isShowUserPostModal(true)}
               >
                 新建

@@ -1,5 +1,5 @@
 import React, {useCallback} from 'react';
-import {LogoutOutlined, SettingOutlined, UserOutlined} from '@ant-design/icons';
+import {LogoutOutlined} from '@ant-design/icons';
 import {Menu, Spin} from 'antd';
 import {history, useModel} from 'umi';
 import {stringify} from 'querystring';
@@ -7,6 +7,7 @@ import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 import {MenuInfo} from 'rc-menu/lib/interface';
 import Cookies from 'js-cookie'
+import {EditOutlined, ProfileOutlined} from "@ant-design/icons/lib";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -21,6 +22,8 @@ const loginOut = async () => {
   // Note: There may be security issues, please note
   if (window.location.pathname !== '/user/login' && !redirect) {
     Cookies.remove('V_PERCODE');
+    localStorage.removeItem("con_person");
+    localStorage.removeItem("con_menu");
     history.replace({
       pathname: '/user/login',
       search: stringify({
@@ -36,12 +39,12 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu}) => {
   const onMenuClick = useCallback(
     (event: MenuInfo) => {
       const {key} = event;
-      if (key === 'logout') {
-        setInitialState((s) => ({...s, currentUser: undefined}));
+      if (key === 'logout' && initialState) {
+        setInitialState({...initialState, currentUser: undefined});
         loginOut();
         return;
       }
-      history.push(`/account/${key}`);
+      history.push(`/personalcenter/${key}`);
     },
     [setInitialState],
   );
@@ -72,15 +75,15 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu}) => {
   const menuHeaderDropdown = (
     <Menu className={styles.menu} selectedKeys={[]} onClick={onMenuClick}>
       {menu && (
-        <Menu.Item key="center">
-          <UserOutlined/>
-          个人中心
+        <Menu.Item key="todo">
+          <ProfileOutlined/>
+          待办任务
         </Menu.Item>
       )}
       {menu && (
-        <Menu.Item key="settings">
-          <SettingOutlined/>
-          个人设置
+        <Menu.Item key="updatePass">
+          <EditOutlined/>
+          修改密码
         </Menu.Item>
       )}
       {menu && <Menu.Divider/>}
