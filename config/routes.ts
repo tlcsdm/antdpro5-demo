@@ -22,14 +22,35 @@
     routes: [
       {
         path: '/personalcenter',
-        component: './Welcome',
+        redirect: '/personalcenter/todo/approval',
       },
       {
         name: '待办任务',
         icon: 'profile',
         path: '/personalcenter/todo',
-        component: './Welcome',
+        component: './contract/person/todo',
         access: 'hasRoute',
+        routes: [
+          {
+            path: '/personalcenter/todo',
+            redirect: '/personalcenter/todo/approval',
+          },
+          {
+            name: '待审批的合同',
+            path: '/personalcenter/todo/approval',
+            component: './contract/person/todo/approval',
+            access: 'hasRoute',
+          },
+          {
+            name: '待修订的合同',
+            path: '/personalcenter/todo/revise',
+            component: './contract/person/todo/revise',
+            access: 'hasRoute',
+          },
+          {
+            component: './404',
+          },
+        ],
       },
       {
         name: '已办任务',
@@ -41,8 +62,22 @@
       {
         name: '承揽方收藏',
         icon: 'bank',
-        path: '/personalcenter/contractor',
-        component: './contract/person/contractor',
+        path: '/personalcenter/perToContractor',
+        component: './contract/person/perToContractor',
+        access: 'hasRoute',
+      },
+      {
+        name: '模版收藏',
+        icon: 'solution',
+        path: '/personalcenter/perToTemplate',
+        component: './contract/person/perToTemplate',
+        access: 'hasRoute',
+      },
+      {
+        name: '审批常用语',
+        icon: 'solution',
+        path: '/personalcenter/approvalOpinions',
+        component: './contract/person/approvalOpinions',
         access: 'hasRoute',
       },
       {
@@ -59,7 +94,7 @@
   },
   {
     path: '/business',
-    name: '业务重心',
+    name: '业务中心',
     icon: 'desktop',
     access: 'hasRoute',
     routes: [
@@ -102,6 +137,13 @@
         access: 'hasRoute',
       },
       {
+        name: '专业对应流程管理',
+        icon: 'team',
+        path: '/business/majorToFlow',
+        component: './contract/business/majorToFlow',
+        access: 'hasRoute',
+      },
+      {
         name: '模板管理',
         icon: 'container',
         path: '/business/template',
@@ -134,6 +176,13 @@
         icon: 'team',
         path: '/business/perform',
         component: './contract/business/processDefinition',
+        access: 'hasRoute',
+      },
+      {
+        name: '合同编制',
+        icon: 'team',
+        path: '/business/contractPreparation',
+        component: './contract/business/contractPreparation',
         access: 'hasRoute',
       },
       {
@@ -285,7 +334,8 @@
   },
   {
     path: '/',
-    redirect: '/personalcenter/todo',
+    //redirect: '/personalcenter/todo',
+    component: './Welcome',
   },
   {
     component: './404',

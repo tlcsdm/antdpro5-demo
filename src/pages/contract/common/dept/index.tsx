@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Form, Input, message, Popconfirm, Select, Spin, Tree} from 'antd';
+import {Button, Divider, Form, Input, message, Popconfirm, Select, Spin, Tree} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import UpdateDept from './components/UpdateDept';
 import {deleteDept, selectDept, selectDeptTree, updateDeptStatus} from '@/services/contract/common/dept';
@@ -158,14 +158,19 @@ const Applications: React.FC = () => {
       fixed: 'right',
       valueType: 'option',
       render: (_, record) => [
-        <a key={record.I_ID} onClick={() => isShowDeptModal(true, false, record.I_ID)}>编辑</a>,
-        <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '1')}>启用</a>,
-        <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '0')}>停用</a>,
-        <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
-          handleDelete(record.I_ID)
-        }}>
-          <a href="#">删除</a>
-        </Popconfirm>
+        <>
+          <a key={record.I_ID} onClick={() => isShowDeptModal(true, false, record.I_ID)}>编辑</a>
+          <Divider type="vertical"/>
+          <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '1')}>启用</a>
+          <Divider type="vertical"/>
+          <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '0')}>停用</a>
+          <Divider type="vertical"/>
+          <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
+            handleDelete(record.I_ID)
+          }}>
+            <a href="#">删除</a>
+          </Popconfirm>
+        </>
       ],
     },
   ];

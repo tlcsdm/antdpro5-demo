@@ -8,11 +8,9 @@ import ProForm, {
   ProFormUploadButton,
 } from '@ant-design/pro-form';
 import 'antd/dist/antd.min.css';
-import {loadTemplate} from "@/services/contract/business/template";
+import {insertTemplate, loadTemplate, updateTemplate} from "@/services/contract/business/template";
 import {selectTemplateType} from "@/services/contract/business/templateType";
 import {yesNoEnum} from "@/utils/enum";
-import Cookies from "js-cookie";
-import request from "umi-request";
 
 const UpdateTemplate = (props: any) => {
   const {isModalVisible, isShowModal, actionRef, templateId} = props;
@@ -72,21 +70,12 @@ const UpdateTemplate = (props: any) => {
         formData.append('V_DESCRIPTION', value.V_DESCRIPTION === undefined ? '' : value.V_DESCRIPTION); //模板描述
         formData.append('V_TYPEID', value.V_TYPEID); //模板类型
         formData.append('V_TEMPTYPE', value.V_TEMPTYPE); //是否集团模板
-        formData.append('V_PERCODE', (Cookies as any).get('V_PERCODE')); //最后修改人
         let resp = [];
         if (template === undefined) {
-          resp = await request('/api/contract-system/insertTemplate', {
-            method: 'post',
-            processData: false,
-            data: formData,
-          });
+          resp = await insertTemplate(formData);
         } else {
           formData.append('I_ID', (template as any).I_ID); //最后修改人
-          resp = await request('/api/contract-system/updateTemplate', {
-            method: 'post',
-            processData: false,
-            data: formData,
-          });
+          resp = await updateTemplate(formData);
         }
         if (resp.success) {
           message.success('操作成功');

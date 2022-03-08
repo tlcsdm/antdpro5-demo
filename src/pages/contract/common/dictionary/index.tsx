@@ -1,5 +1,5 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {Button, message, Popconfirm} from 'antd';
+import {Button, Divider, message, Popconfirm} from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
@@ -106,12 +106,15 @@ const Applications: React.FC = () => {
       hideInSearch: true,
       valueType: 'option',  //操作列的类型
       render: (_, record) => [   //render渲染 record代表当前行
-        <a key={record.I_ID} onClick={() => isShowModal(true, record.I_ID)}>编辑</a>,
-        <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
-          handleRemove(record.I_ID)
-        }}>
-          <a href="#">删除</a>
-        </Popconfirm>
+        <>
+          <a key={record.I_ID} onClick={() => isShowModal(true, record.I_ID)}>编辑</a>
+          <Divider type="vertical"/>
+          <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
+            handleRemove(record.I_ID)
+          }}>
+            <a href="#">删除</a>
+          </Popconfirm>
+        </>
       ]
     }
   ];

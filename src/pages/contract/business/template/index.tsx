@@ -1,15 +1,19 @@
 import {PlusOutlined} from '@ant-design/icons';
-import {Button, message, Popconfirm} from 'antd';
+import {Button, Divider, message, Popconfirm} from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
 import 'moment/locale/zh-cn'
 import UpdateTemplate from "./components/UpdateTemplate";
 import {ProFormInstance} from '@ant-design/pro-form';
-import {deleteTemplate, selectTemplate, updateTemplateStatus} from "@/services/contract/business/template";
+import {
+  deleteTemplate,
+  downloadTemplate,
+  selectTemplate,
+  updateTemplateStatus
+} from "@/services/contract/business/template";
 import {selectTemplateType} from "@/services/contract/business/templateType";
 import {statusEnum} from "@/utils/enum";
-import Cookies from "js-cookie";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
@@ -69,12 +73,6 @@ const Applications: React.FC = () => {
     }
   };
 
-  //下载模板
-  const downloadTemplate = async (id: any, V_URL: any, V_FILENAME: any) => {
-    window.location.href = '/api/contract-system/downloadTemplate?I_ID=' + id + '&V_PERCODE=' + Cookies.get('V_PERCODE') +
-      '&V_URL=' + encodeURIComponent(V_URL) + '&V_FILENAME=' + encodeURIComponent(V_FILENAME);
-  };
-
   const columns: ProColumns[] = [  //定义 Protable的列 columns放在Protable
     {
       title: '序号',
@@ -123,23 +121,33 @@ const Applications: React.FC = () => {
       hideInSearch: true,
       valueType: 'option',  //操作列的类型
       render: (_, record) => [   //render渲染 record代表当前行
-        <a key={record.I_ID} onClick={() => isShowModal(true, record.I_ID)}>编辑</a>,
-        <Popconfirm key={record.I_ID} title="确认启用？" okText="确认" cancelText="取消" onConfirm={(e) => {
-          updateStatus(record.I_ID, record.V_STATUS, '1');
-        }}>
-          <a href="#">启用</a>
-        </Popconfirm>,
-        <Popconfirm key={record.I_ID} title="确认停用？" okText="确认" cancelText="取消" onConfirm={(e) => {
-          updateStatus(record.I_ID, record.V_STATUS, '0');
-        }}>
-          <a href="#">停用</a>
-        </Popconfirm>,
-        <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={(e) => {
-          handleRemove(record.I_ID, record.V_URL);
-        }}>
-          <a href="#">删除</a>
-        </Popconfirm>,
-        <a key={record.I_ID} onClick={() => downloadTemplate(record.I_ID, record.V_URL, record.V_FILENAME)}>下载</a>
+        <>
+          <a key={record.I_ID} onClick={() => isShowModal(true, record.I_ID)}>编辑</a>
+          <Divider type="vertical"/>
+          <Popconfirm key={record.I_ID} title="确认启用？" okText="确认" cancelText="取消" onConfirm={(e) => {
+            updateStatus(record.I_ID, record.V_STATUS, '1');
+          }}>
+            <a href="#">启用</a>
+          </Popconfirm>
+          <Divider type="vertical"/>
+          <Popconfirm key={record.I_ID} title="确认停用？" okText="确认" cancelText="取消" onConfirm={(e) => {
+            updateStatus(record.I_ID, record.V_STATUS, '0');
+          }}>
+            <a href="#">停用</a>
+          </Popconfirm>
+          <Divider type="vertical"/>
+          <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={(e) => {
+            handleRemove(record.I_ID, record.V_URL);
+          }}>
+            <a href="#">删除</a>
+          </Popconfirm>
+          <Divider type="vertical"/>
+          <a key={record.I_ID} onClick={() => downloadTemplate({
+            I_ID: record.I_ID,
+            V_URL: record.V_URL,
+            V_FILENAME: record.V_FILENAME,
+          })}>下载</a>
+        </>
       ]
     }, {
       title: '最后修改时间',

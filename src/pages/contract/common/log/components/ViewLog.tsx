@@ -21,7 +21,7 @@ const ViewLog = (props: any) => {
   return (
     <Modal
       title={'查看日志'}
-      width="1000px"
+      width="1200px"
       visible={isModalVisible}
       footer={[<Button key="close" type="primary" onClick={handleCancel}>关闭</Button>,]}
       onCancel={handleCancel}

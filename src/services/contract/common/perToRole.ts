@@ -1,5 +1,6 @@
 import Qs from "qs";
 import request from "@/utils/request";
+import {download} from "@/utils/base";
 
 //查询人员角色
 export async function selectPerToRole(params: any) {
@@ -30,6 +31,14 @@ export async function deletePerToRole(params: any) {
     data: Qs.stringify(params)
   });
   return res;
+}
+
+/**
+ * 导出人员角色
+ * @param params
+ */
+export async function exportPerToRole(params?: { [key: string]: any }) {
+  return download('/api/contract-system/exportPerToRole', params);
 }
 
 

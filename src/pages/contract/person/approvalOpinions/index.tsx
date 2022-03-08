@@ -4,15 +4,14 @@ import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
 import 'moment/locale/zh-cn'
-import UpdateSponsor from "./components/UpdateSponsor";
+import UpdateApprovalOpinions from "./components/UpdateApprovalOpinions";
 import {ProFormInstance} from '@ant-design/pro-form';
-import {deleteSponsor, selectSponsor, updateSponsorStatus} from "@/services/contract/business/sponsor";
-import {statusEnum} from "@/utils/enum";
+import {deleteApprovalOpinions, selectApprovalOpinions} from "@/services/contract/person/approvalOpinions";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [sponsorId, setSponsorId] = useState(undefined);
+  const [approvalOpinionsId, setApprovalOpinionsId] = useState(undefined);
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
 
@@ -20,7 +19,7 @@ const Applications: React.FC = () => {
    * 控制模态框显示和隐藏
    */
   const isShowModal = (show: boolean | ((prevState: boolean) => boolean), id = undefined) => {
-    setSponsorId(id);
+    setApprovalOpinionsId(id);
     setIsModalVisible(show);
   };
 
@@ -29,28 +28,16 @@ const Applications: React.FC = () => {
 
   }, []);
 
-  //修改状态
-  const updateStatus = async (id: any, V_STATUS: string, status: any) => {
-    if (V_STATUS === status) return;
-    const rep = await updateSponsorStatus({I_ID: id, V_STATUS: status});
-    if (rep && rep.success) {
-      message.success('操作成功');
-      actionRef.current?.reloadAndRest?.(); //刷新Protable
-    }
-  };
-
-  //删除定作方
+  //删除审批常用语
   const handleRemove = async (id: any) => {
     if (!id) return true;
     const hide = message.loading('正在删除');
-    const req = await deleteSponsor({
+    await deleteApprovalOpinions({
       I_ID: id
     });
     hide();
-    if (req && req.success) {
-      message.success('删除成功，即将刷新');
-      actionRef.current?.reloadAndRest?.(); //刷新Protable
-    }
+    message.success('删除成功，即将刷新');
+    actionRef.current?.reloadAndRest?.(); //刷新Protable
     return true;
   };
 
@@ -62,40 +49,11 @@ const Applications: React.FC = () => {
       hideInTable: false,
       render: (text, record, index) => `${index + 1}`
     }, {
-      title: '定作方名称',
-      dataIndex: 'V_SPONSORNAME',
-      width: 150,
-      hideInSearch: false,
-      hideInTable: false
-    }, {
-      title: '定作方编码',
-      dataIndex: 'V_SPONSORCODE',
-      width: 150,
-      hideInSearch: false,
-      hideInTable: false
-    }, {
-      title: '定作方法人',
-      dataIndex: 'V_OFFICER',
+      title: '审批意见',
+      dataIndex: 'V_OPINIONS',
       width: 150,
       hideInSearch: true,
       hideInTable: false
-    }, {
-      title: '电话号码',
-      dataIndex: 'V_PHONE',
-      width: 150,
-      hideInSearch: true,
-      hideInTable: false
-    }, {
-      title: '显示排序',
-      dataIndex: 'I_ORDER',
-      width: 80,
-      hideInSearch: true,
-      hideInTable: false
-    }, {
-      title: '状态',
-      dataIndex: 'V_STATUS',
-      width: 50,
-      valueEnum: statusEnum,
     }, {
       title: '操作',
       width: 150,
@@ -103,17 +61,15 @@ const Applications: React.FC = () => {
       valueType: 'option',  //操作列的类型
       render: (_, record) => [   //render渲染 record代表当前行
         <>
-          <a key={record.I_ID} onClick={() => isShowModal(true, record.I_ID)}>编辑</a>
-          <Divider type="vertical"/>
-          <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '1')}>启用</a>
-          <Divider type="vertical"/>
-          <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '0')}>停用</a>
-          <Divider type="vertical"/>
-          <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
-            handleRemove(record.I_ID)
-          }}>
-            <a href="#">删除</a>
-          </Popconfirm>
+          <a key={record.I_ID} style={{display: ((record.V_TYPE === 2) ? 'inline' : 'none')}}
+             onClick={() => isShowModal(true, record.I_ID)}>编辑</a>
+          <Divider type="vertical" style={{display: ((record.V_TYPE === 2) ? 'inline' : 'none')}}/>
+          {record.V_TYPE === 2 ?
+            <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={(e) => {
+              handleRemove(record.I_ID)
+            }}>
+              <a href="#">删除</a>
+            </Popconfirm> : null}
         </>
       ]
     }
@@ -124,7 +80,7 @@ const Applications: React.FC = () => {
     <PageContainer title={false} ghost>
       <ProTable
         columns={columns}// 上面定义的表格列
-        headerTitle="定作方列表" // 表头
+        headerTitle="审批常用语列表" // 表头
         actionRef={actionRef} // 用于触发刷新操作等，看api
         formRef={formRef}
         rowKey="I_ID"// 表格行 key 的取值，可以是字符串或一个函数
@@ -135,10 +91,7 @@ const Applications: React.FC = () => {
           reload: true, // 刷新
           setting: true // 列设置
         }}
-        pagination={{  //设置分页 ，可设置为pagination={false}不加分页
-          pageSize: 20,
-          current: 1
-        }}
+        pagination={false}
         toolBarRender={(action, {selectedRows}) => [ //工具栏 与 表头headerTitle同一行 可设置为false，设置false表头无效
           <Button
             icon={<PlusOutlined/>}  //图标，其他图标可去ant官网搜索icon，单击即可复制
@@ -149,17 +102,12 @@ const Applications: React.FC = () => {
             新建
           </Button>
         ]}
-        search={{
-          defaultCollapsed: false,
-          optionRender: (searchConfig, formProps, dom) => [
-            ...dom.reverse()
-          ]
-        }}
+        search={false}
         request={async (params) => {   //调用请求加载表格数据， 默认自动加载 params为Search的查询条件参数
           const newParams = {};
           //可对params传参进行进一步处理后再调用查询
           Object.assign(newParams, params);
-          return await selectSponsor({...newParams});
+          return await selectApprovalOpinions({...newParams});
         }}
       />
 
@@ -168,11 +116,11 @@ const Applications: React.FC = () => {
         !isModalVisible ? (
           ''
         ) : (
-          <UpdateSponsor
+          <UpdateApprovalOpinions
             isModalVisible={isModalVisible}
             isShowModal={isShowModal}
             actionRef={actionRef}
-            sponsorId={sponsorId}
+            approvalOpinionsId={approvalOpinionsId}
           />
         )
       }

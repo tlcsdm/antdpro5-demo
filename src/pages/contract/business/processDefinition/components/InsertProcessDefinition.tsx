@@ -3,8 +3,7 @@ import {message} from 'antd';
 import ProForm, {ModalForm, ProFormInstance, ProFormText,} from '@ant-design/pro-form';
 import 'antd/dist/antd.min.css';
 import ProFormUploadButton from "@ant-design/pro-form/lib/components/UploadButton";
-import Cookies from "js-cookie";
-import request from "umi-request";
+import {insertProcessDefinition} from "@/services/contract/business/processDefinition";
 
 const InsertProcessDefinition = (props: any) => {
   const {isModalVisible, isShowModal, actionRef} = props;
@@ -24,12 +23,7 @@ const InsertProcessDefinition = (props: any) => {
       formData.append('multipartFiles', file.originFileObj);//文件
     });
     formData.append('category', fields.category); //文件类型
-    formData.append('V_PERCODE', (Cookies as any).get('V_PERCODE'));
-    const resp = request('/api/contract-system/insertProcessDefinition', {
-      method: 'post',
-      processData: false,
-      data: formData,
-    });
+    const resp = insertProcessDefinition(formData);
     return resp.then((data: any) => {
       if (data.success) {
         message.success('上传成功');

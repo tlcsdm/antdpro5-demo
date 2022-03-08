@@ -169,7 +169,7 @@ const Applications: React.FC = () => {
             formRef={formRef}
             onRow={record => {
               return {
-                onClick: event => getRoleToMenuTable(record.I_ID, record.V_ORLENAME)
+                onClick: event => getRoleToMenuTable(record.V_ORLECODE, record.V_ORLENAME)
               };
             }}
             rowKey="I_ID"// 表格行 key 的取值，可以是字符串或一个函数

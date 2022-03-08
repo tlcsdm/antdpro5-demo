@@ -5,7 +5,7 @@ import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
 import 'moment/locale/zh-cn'
 import {ProFormInstance} from '@ant-design/pro-form';
 import {PlusOutlined} from "@ant-design/icons/lib";
-import {selectProcessDefinition} from "@/services/contract/common/processDefinition";
+import {selectProcessDefinition} from "@/services/contract/business/processDefinition";
 import InsertProcessDefinition from "@/pages/contract/business/processDefinition/components/InsertProcessDefinition";
 import ViewProcessDefinitionDiagram from './components/ViewProcessDefinitionDiagram';
 

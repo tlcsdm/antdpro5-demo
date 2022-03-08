@@ -4,11 +4,10 @@ import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
 import 'moment/locale/zh-cn';
 import {ProFormInstance} from '@ant-design/pro-form';
 import ViewLog from './components/ViewLog';
-import {selectLog} from '@/services/contract/common/log';
+import {exportLog, selectLog} from '@/services/contract/common/log';
 import {getDate, getMonthFirstDay} from '@/utils/date';
 import {Button} from "antd";
 import {successEnum} from "@/utils/enum";
-import Cookies from "js-cookie";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
@@ -216,20 +215,11 @@ const Applications: React.FC = () => {
               //icon={<DownloadOutlined/>}
               key="export"
               onClick={() => {
-                window.location.href = '/api/contract-system/exportLog?' +
-                  'V_SERVICE=' + encodeURIComponent(formProps.form?.getFieldValue('V_SERVICE') ? formProps.form?.getFieldValue('V_SERVICE') : '') +
-                  '&V_TITLE=' + encodeURIComponent(formProps.form?.getFieldValue('V_TITLE') ? formProps.form?.getFieldValue('V_TITLE') : '') +
-                  '&V_OPERATEPER=' + encodeURIComponent(formProps.form?.getFieldValue('V_OPERATEPER') ? formProps.form?.getFieldValue('V_OPERATEPER') : '') +
-                  '&V_IP=' + encodeURIComponent(formProps.form?.getFieldValue('V_IP') ? formProps.form?.getFieldValue('V_IP') : '') +
-                  '&V_OPERATETYPE=' + encodeURIComponent(formProps.form?.getFieldValue('V_OPERATETYPE') ? formProps.form?.getFieldValue('V_OPERATETYPE') : '') +
-                  '&V_SUCCESS=' + encodeURIComponent(formProps.form?.getFieldValue('V_SUCCESS') ? formProps.form?.getFieldValue('V_SUCCESS') : '') +
-                  '&V_URL=' + encodeURIComponent(formProps.form?.getFieldValue('V_URL') ? formProps.form?.getFieldValue('V_URL') : '') +
-                  '&V_PARAMS=' + encodeURIComponent(formProps.form?.getFieldValue('V_PARAMS') ? formProps.form?.getFieldValue('V_PARAMS') : '') +
-                  '&I_TRACEID=' + encodeURIComponent(formProps.form?.getFieldValue('I_TRACEID') ? formProps.form?.getFieldValue('I_TRACEID') : '') +
-                  '&START_DATE=' + encodeURIComponent((typeof (formProps.form?.getFieldValue('V_CREATETIME')[0]) == 'string') ? formProps.form?.getFieldValue('V_CREATETIME')[0] : formProps.form?.getFieldValue('V_CREATETIME')[0].format('YYYY-MM-DD')) +
-                  '&END_DATE=' + encodeURIComponent((typeof (formProps.form?.getFieldValue('V_CREATETIME')[1]) == 'string') ? formProps.form?.getFieldValue('V_CREATETIME')[1] : formProps.form?.getFieldValue('V_CREATETIME')[1].format('YYYY-MM-DD')) +
-                  '&V_PROVERSION=' + encodeURIComponent(formProps.form?.getFieldValue('V_PROVERSION') ? formProps.form?.getFieldValue('V_PROVERSION') : '') +
-                  '&V_PERCODE=' + Cookies.get('V_PERCODE');
+                exportLog({
+                  ...formProps.form?.getFieldsValue(),
+                  START_DATE: (typeof (formProps.form?.getFieldValue('V_CREATETIME')[0]) == 'string') ? formProps.form?.getFieldValue('V_CREATETIME')[0] : formProps.form?.getFieldValue('V_CREATETIME')[0].format('YYYY-MM-DD'),
+                  END_DATE: (typeof (formProps.form?.getFieldValue('V_CREATETIME')[1]) == 'string') ? formProps.form?.getFieldValue('V_CREATETIME')[1] : formProps.form?.getFieldValue('V_CREATETIME')[1].format('YYYY-MM-DD')
+                });
               }}>
               导出
             </Button>

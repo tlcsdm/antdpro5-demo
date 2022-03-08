@@ -3,11 +3,10 @@ import {PageContainer} from '@ant-design/pro-layout';
 import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
 import 'moment/locale/zh-cn';
 import {ProFormInstance} from '@ant-design/pro-form';
-import {selectLoginLog} from '@/services/contract/common/loginLog';
+import {exportLoginLog, selectLoginLog} from '@/services/contract/common/loginLog';
 import {successEnum} from '@/utils/enum';
 import {Button} from 'antd';
 import {getDate, getMonthFirstDay} from '@/utils/date';
-import Cookies from "js-cookie";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
@@ -141,39 +140,11 @@ const Applications: React.FC = () => {
             <Button
               key="export"
               onClick={() => {
-                window.location.href =
-                  '/api/contract-system/exportLoginLog?' +
-                  '&V_OPERATEPER=' +
-                  encodeURIComponent(
-                    formProps.form?.getFieldValue('V_OPERATEPER')
-                      ? formProps.form?.getFieldValue('V_OPERATEPER')
-                      : '',
-                  ) +
-                  '&V_IP=' +
-                  encodeURIComponent(
-                    formProps.form?.getFieldValue('V_IP')
-                      ? formProps.form?.getFieldValue('V_IP')
-                      : '',
-                  ) +
-                  '&V_SUCCESS=' +
-                  encodeURIComponent(
-                    formProps.form?.getFieldValue('V_SUCCESS')
-                      ? formProps.form?.getFieldValue('V_SUCCESS')
-                      : '',
-                  ) +
-                  '&START_DATE=' +
-                  encodeURIComponent(
-                    typeof formProps.form?.getFieldValue('V_CREATETIME')[0] == 'string'
-                      ? formProps.form?.getFieldValue('V_CREATETIME')[0]
-                      : formProps.form?.getFieldValue('V_CREATETIME')[0].format('YYYY-MM-DD'),
-                  ) +
-                  '&END_DATE=' +
-                  encodeURIComponent(
-                    typeof formProps.form?.getFieldValue('V_CREATETIME')[1] == 'string'
-                      ? formProps.form?.getFieldValue('V_CREATETIME')[1]
-                      : formProps.form?.getFieldValue('V_CREATETIME')[1].format('YYYY-MM-DD'),
-                  ) +
-                  '&V_PERCODE=' + Cookies.get('V_PERCODE');
+                exportLoginLog({
+                  ...formProps.form?.getFieldsValue(),
+                  START_DATE: (typeof (formProps.form?.getFieldValue('V_CREATETIME')[0]) == 'string') ? formProps.form?.getFieldValue('V_CREATETIME')[0] : formProps.form?.getFieldValue('V_CREATETIME')[0].format('YYYY-MM-DD'),
+                  END_DATE: (typeof (formProps.form?.getFieldValue('V_CREATETIME')[1]) == 'string') ? formProps.form?.getFieldValue('V_CREATETIME')[1] : formProps.form?.getFieldValue('V_CREATETIME')[1].format('YYYY-MM-DD')
+                });
               }}
             >
               导出

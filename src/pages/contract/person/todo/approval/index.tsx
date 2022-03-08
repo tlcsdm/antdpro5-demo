@@ -61,6 +61,8 @@ const Applications: React.FC = () => {
     {
       title: '序号',
       width: 50,
+      hideInSearch: true,
+      hideInTable: false,
       render: (text, record, index) => `${index + 1}`,
     },
     {

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Form, Input, message, Popconfirm, Spin, Tree} from 'antd';
+import {Button, Divider, Form, Input, message, Popconfirm, Spin, Tree} from 'antd';
 import {PlusOutlined} from '@ant-design/icons';
 import UpdateMenu from './components/UpdateMenu';
 import {deleteMenu, selectMenu, selectMenuTree} from '@/services/contract/common/menu';
@@ -118,11 +118,11 @@ const Applications: React.FC = () => {
       dataIndex: 'V_ADDRESS_ICO',
       width: 70
     },
-    {
-      title: '系统编码',
-      dataIndex: 'V_SYSTYPE',
-      width: 70
-    },
+    // {
+    //   title: '系统编码',
+    //   dataIndex: 'V_SYSTYPE',
+    //   width: 70
+    // },
     {
       title: '显示顺序',
       dataIndex: 'I_ORDER',
@@ -132,16 +132,19 @@ const Applications: React.FC = () => {
     },
     {
       title: '操作',
-      width: 60,
+      width: 80,
       fixed: 'right',
       valueType: 'option',
       render: (_, record) => [
-        <a key={record.I_ID} onClick={() => isShowMenuModal(true, false, record.I_ID)}>编辑</a>,
-        <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
-          handleDelete(record.I_ID)
-        }}>
-          <a href="#">删除</a>
-        </Popconfirm>
+        <>
+          <a key={record.I_ID} onClick={() => isShowMenuModal(true, false, record.I_ID)}>编辑</a>
+          <Divider type="vertical"/>
+          <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
+            handleDelete(record.I_ID)
+          }}>
+            <a href="#">删除</a>
+          </Popconfirm>
+        </>
       ],
     },
   ];

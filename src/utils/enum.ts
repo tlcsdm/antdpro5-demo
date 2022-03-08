@@ -42,3 +42,18 @@ export const deptTypeOpinion = [
   {value: '厂矿部门', label: '厂矿部门'},
   {value: '厂矿车间', label: '厂矿车间'}
 ];
+
+//流程状态
+export const activityStatus = {
+  1: {text: '审批通过', status: 'Success'},
+  0: {text: '审批中', status: 'Processing'},
+  2: {text: '审批驳回', status: 'Error'},
+  3: {text: '未审批', status: 'Default'},
+};
+
+//合同类型
+export const contractTypeOpinion = [
+  {label: '议标', value: '议标'},
+  {label: '中标', value: '中标'},
+  {label: '关联审批', value: '关联审批'}
+];

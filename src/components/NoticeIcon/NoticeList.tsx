@@ -1,4 +1,4 @@
-import { Avatar, List } from 'antd';
+import {Avatar, List} from 'antd';
 
 import React from 'react';
 import classNames from 'classnames';
@@ -35,7 +35,7 @@ const NoticeList: React.FC<NoticeIconTabProps> = ({
     return (
       <div className={styles.notFound}>
         <img
-          src="https://gw.alipayobjects.com/zos/rmsportal/sAuJeJzSKbUmHfBQRzmZ.svg"
+          src="/notice/message.svg"
           alt="not found"
         />
         <div>{emptyText}</div>

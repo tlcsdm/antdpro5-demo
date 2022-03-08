@@ -1,5 +1,5 @@
-import Qs from "qs";
 import request from "@/utils/request";
+import {upload} from "@/utils/base";
 
 //加载流程定义
 export async function loadRole(params: any) {
@@ -9,7 +9,6 @@ export async function loadRole(params: any) {
   });
   return res;
 }
-
 
 //查询流程定义
 export async function selectProcessDefinition(params: any) {
@@ -25,12 +24,8 @@ export async function selectProcessDefinition(params: any) {
 }
 
 //新增流程定义
-export async function insertProcessDefinition(params: any) {
-  const res = request('/api/contract-system/insertProcessDefinition', {
-    method: 'POST',
-    data: Qs.stringify(params),
-  });
-  return res;
+export async function insertProcessDefinition(formData: FormData) {
+  return upload('/api/contract-system/insertProcessDefinition', formData);
 }
 
 

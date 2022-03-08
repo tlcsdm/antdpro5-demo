@@ -10,8 +10,7 @@ import ProForm, {
 } from "@ant-design/pro-form";
 import {selectDictionary} from "@/services/contract/common/dictionary";
 import {Col, message, Row, Space} from "antd";
-import request from "umi-request";
-import Cookies from "js-cookie";
+import {insertSystemRider} from "@/services/contract/common/fileUpload";
 
 const Applications: React.FC = () => {
   const [fileList, setFileList] = useState([]);  //附件
@@ -64,12 +63,7 @@ const Applications: React.FC = () => {
           formData.append('V_FILETYPE', value.V_FILETYPE); //文件类型
           formData.append('V_TOPIC', value.V_TOPIC); //文件主题
           formData.append('V_DESC', value.V_DESC == undefined ? '' : value.V_DESC); //文件描述
-          formData.append('V_PERCODE', (Cookies as any).get('V_PERCODE')); //最后修改人
-          const resp = request('/api/contract-system/insertSystemRider', {
-            method: 'post',
-            processData: false,
-            data: formData,
-          });
+          const resp = insertSystemRider(formData);
           return resp.then((data: any) => {
             if (data.success) {
               message.success('上传成功');

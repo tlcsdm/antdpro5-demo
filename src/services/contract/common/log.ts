@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import {download} from "@/utils/base";
 
 //加载日志
 export async function loadLog(params: any) {
@@ -20,6 +21,14 @@ export async function selectLog(params: any) {
     params: {...params}
   });
   return res;
+}
+
+/**
+ * 导出日志
+ * @param params
+ */
+export async function exportLog(params?: { [key: string]: any }) {
+  return download('/api/contract-system/exportLog', params);
 }
 
 

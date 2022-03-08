@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import {download} from "@/utils/base";
 
 //查询登录日志
 export async function selectLoginLog(params: any) {
@@ -11,4 +12,12 @@ export async function selectLoginLog(params: any) {
     params: {...params},
   });
   return res;
+}
+
+/**
+ * 导出登陆日志
+ * @param params
+ */
+export async function exportLoginLog(params?: { [key: string]: any }) {
+  return download('/api/contract-system/exportLoginLog', params);
 }

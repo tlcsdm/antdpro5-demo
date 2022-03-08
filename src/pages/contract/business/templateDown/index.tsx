@@ -3,9 +3,8 @@ import {PageContainer} from '@ant-design/pro-layout';
 import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
 import 'moment/locale/zh-cn'
 import {ProFormInstance} from '@ant-design/pro-form';
-import {selectTemplate} from "@/services/contract/business/template";
+import {downloadTemplate, selectTemplate} from "@/services/contract/business/template";
 import {selectTemplateType} from "@/services/contract/business/templateType";
-import Cookies from "js-cookie";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
@@ -30,12 +29,6 @@ const Applications: React.FC = () => {
   useEffect(() => {
     initTemplateType();
   }, []);
-
-  //下载模板
-  const downloadTemplate = async (id: any, V_URL: any, V_FILENAME: any) => {
-    window.location.href = '/api/contract-system/downloadTemplate?I_ID=' + id + '&V_PERCODE=' + Cookies.get('V_PERCODE') +
-      '&V_URL=' + encodeURIComponent(V_URL) + '&V_FILENAME=' + encodeURIComponent(V_FILENAME);
-  };
 
   const columns: ProColumns[] = [  //定义 Protable的列 columns放在Protable
     {
@@ -65,7 +58,11 @@ const Applications: React.FC = () => {
       hideInSearch: false,
       hideInTable: false,
       render: (text, record) =>
-        <a onClick={() => downloadTemplate(record.I_ID, record.V_URL, record.V_FILENAME)}>{text}</a>
+        <a onClick={() => downloadTemplate({
+          I_ID: record.I_ID,
+          V_URL: record.V_URL,
+          V_FILENAME: record.V_FILENAME,
+        })}>{text}</a>
     }
   ];
 

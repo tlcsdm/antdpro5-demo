@@ -1,5 +1,6 @@
 import Qs from "qs";
 import request from '@/utils/request';
+import {download, upload} from "@/utils/base";
 
 //加载模板
 export async function loadTemplate(params: any) {
@@ -23,13 +24,20 @@ export async function selectTemplate(params: any) {
   return res;
 }
 
-//删除模板
-export async function deleteTemplate(params: any) {
-  const res = request('/api/contract-system/deleteTemplate', {
-    method: 'POST',
-    data: Qs.stringify(params),
-  });
-  return res;
+/**
+ * 新增模版
+ * @param formData
+ */
+export async function insertTemplate(formData: FormData) {
+  return upload('/api/contract-system/insertTemplate', formData);
+}
+
+/**
+ * 修改模版
+ * @param formData
+ */
+export async function updateTemplate(formData: FormData) {
+  return upload('/api/contract-system/updateTemplate', formData);
 }
 
 //修改模板类型状态
@@ -41,6 +49,22 @@ export async function updateTemplateStatus(params: any) {
   return res;
 }
 
+//删除模板
+export async function deleteTemplate(params: any) {
+  const res = request('/api/contract-system/deleteTemplate', {
+    method: 'POST',
+    data: Qs.stringify(params),
+  });
+  return res;
+}
+
+/**
+ * 下载模版
+ * @param params
+ */
+export async function downloadTemplate(params?: { [key: string]: any }) {
+  return download('/api/contract-system/downloadTemplate', params);
+}
 
 
 

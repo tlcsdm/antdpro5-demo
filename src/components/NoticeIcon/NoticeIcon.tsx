@@ -1,14 +1,13 @@
-import { BellOutlined } from '@ant-design/icons';
-import { Badge, Spin, Tabs } from 'antd';
+import {BellOutlined} from '@ant-design/icons';
+import {Badge, Spin, Tabs} from 'antd';
 import useMergedState from 'rc-util/es/hooks/useMergedState';
 import React from 'react';
 import classNames from 'classnames';
-import { NoticeIconTabProps } from './NoticeList';
-import NoticeList from './NoticeList';
+import NoticeList, {NoticeIconTabProps} from './NoticeList';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 
-const { TabPane } = Tabs;
+const {TabPane} = Tabs;
 
 export type NoticeIconProps = {
   count?: number;
@@ -118,7 +117,7 @@ const NoticeIcon: React.FC<NoticeIconProps> & {
 };
 
 NoticeIcon.defaultProps = {
-  emptyImage: 'https://gw.alipayobjects.com/zos/rmsportal/wAhyIChODzsoKIOBHcBk.svg',
+  emptyImage: '/notice/noticeIcon.svg',
 };
 
 NoticeIcon.Tab = NoticeList;

@@ -7,7 +7,12 @@ import ProTable, {ProColumns} from "@ant-design/pro-table";
 import {deletePersonToDept, insertPersonToDeptBatch, selectPersonToDept} from "@/services/contract/common/personToDept";
 import {PageContainer} from "@ant-design/pro-layout";
 import PreChoosePerson from "@/components/Choose/PreChoosePerson";
-import {deletePerToRole, insertPerToRoleBatch, selectPerToRole} from "@/services/contract/common/perToRole";
+import {
+  deletePerToRole,
+  exportPerToRole,
+  insertPerToRoleBatch,
+  selectPerToRole
+} from "@/services/contract/common/perToRole";
 import PreChooseRole from "@/components/Choose/PreChooseRole";
 import {DownloadOutlined, UploadOutlined} from "@ant-design/icons/lib";
 import Cookies from "js-cookie";
@@ -329,13 +334,14 @@ const Applications: React.FC = () => {
                 key="export"
                 disabled={(personCode === '')}
                 onClick={() => {
-                  window.location.href = '/api/contract-system/exportPerToRole?' +
-                    'V_PERCODE_FORM=' + encodeURIComponent(personCode);
+                  exportPerToRole({
+                    V_PERCODE_FORM: personCode
+                  });
                 }}>
-                导出
+                导出人员角色
               </Button>,
               <Upload {...fileProps} action="/api/contract-system/importPerToRole">
-                <Button icon={<UploadOutlined/>} disabled={(personCode === '')}>导入</Button>
+                <Button icon={<UploadOutlined/>} disabled={(personCode === '')}>导入人员角色</Button>
               </Upload>,
             ]}
           />
