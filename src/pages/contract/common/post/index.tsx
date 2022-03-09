@@ -7,6 +7,7 @@ import ProCard from '@ant-design/pro-card';
 import ProTable, {ProColumns} from "@ant-design/pro-table";
 import {PageContainer} from "@ant-design/pro-layout";
 import {statusEnum, yesNoEnum} from "@/utils/enum";
+import StatusSwitch from "@/components/StatusSwitch";
 
 const Applications: React.FC = () => {
   const [isPostModalVisible, setIsPostModalVisible] = useState(false);
@@ -23,16 +24,6 @@ const Applications: React.FC = () => {
     const rep = await selectPostTree({});
     setTreeData(postTree(rep.data));
   }, []);
-
-  //修改状态
-  const updateStatus = async (id: any, V_STATUS: string, status: any) => {
-    if (V_STATUS === status) return;
-    const rep = await updatePostStatus({I_ID: id, V_STATUS: status});
-    if (rep && rep.success) {
-      message.success('操作成功');
-      getPostTable(treeKey);
-    }
-  };
 
   const postTree = (postTreeData: any) => {
     return postTreeData.map((item: any) => ({
@@ -118,6 +109,7 @@ const Applications: React.FC = () => {
       dataIndex: 'V_STATUS',
       width: 50,
       valueEnum: statusEnum,
+      render: (text, record, index) => <StatusSwitch row={record} key={record.I_ID} updateStatus={updatePostStatus}/>
     }, {
       title: '操作',
       width: 180,
@@ -126,10 +118,6 @@ const Applications: React.FC = () => {
       render: (_, record) => [
         <>
           <a key={record.I_ID} onClick={() => isShowPostModal(true, false, record.I_ID)}>编辑</a>
-          <Divider type="vertical"/>
-          <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '1')}>启用</a>
-          <Divider type="vertical"/>
-          <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '0')}>停用</a>
           <Divider type="vertical"/>
           <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
             handleDelete(record.I_ID)

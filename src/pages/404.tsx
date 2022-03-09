@@ -8,9 +8,14 @@ const NoFoundPage: React.FC = () => (
     title="404"
     subTitle="当前页不存在."
     extra={
-      <Button type="primary" onClick={() => history.push('/')}>
-        返回上一页
-      </Button>
+      [
+        <Button type="primary" onClick={() => history.goBack()}>
+          返回上一页
+        </Button>,
+        <Button type="primary" onClick={() => history.push('/')}>
+          回到首页
+        </Button>
+      ]
     }
   />
 );

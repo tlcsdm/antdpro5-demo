@@ -259,13 +259,13 @@ const UpdateContractPreparation = (props: any) => {
           ]}
         />
         <ProFormText
-          label="合同范本"
+          label="合同模版"
           width="sm"
           name="V_TEMPLATE"
           rules={[
             {
               required: true,
-              message: '合同范本为必填项'
+              message: '合同模版为必填项'
             }
           ]}
           addonAfter={<a onClick={() => isShowTemplateModal(true)}>选择</a>}

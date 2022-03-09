@@ -14,6 +14,7 @@ import {
 } from "@/services/contract/business/template";
 import {selectTemplateType} from "@/services/contract/business/templateType";
 import {statusEnum} from "@/utils/enum";
+import StatusSwitch from "@/components/StatusSwitch";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
@@ -63,16 +64,6 @@ const Applications: React.FC = () => {
     return true;
   };
 
-  //修改合同模版状态
-  const updateStatus = async (id: any, V_STATUS: string, status: any) => {
-    if (V_STATUS === status) return;
-    const rep = await updateTemplateStatus({I_ID: id, V_STATUS: status});
-    if (rep && rep.success) {
-      message.success('操作成功');
-      actionRef.current?.reloadAndRest?.(); //刷新Protable
-    }
-  };
-
   const columns: ProColumns[] = [  //定义 Protable的列 columns放在Protable
     {
       title: '序号',
@@ -101,13 +92,6 @@ const Applications: React.FC = () => {
       hideInSearch: false,
       hideInTable: false
     }, {
-      title: '状态',
-      dataIndex: 'V_STATUS',
-      width: 100,
-      hideInSearch: false,
-      hideInTable: false,
-      valueEnum: statusEnum
-    }, {
       title: '模板查看',
       width: 100,
       hideInSearch: true,
@@ -116,6 +100,22 @@ const Applications: React.FC = () => {
         <a key={record.I_ID} /*onClick={() => isViewShowModal(true, record.I_ID)}*/>查看</a>,
       ]
     }, {
+      title: '状态',
+      dataIndex: 'V_STATUS',
+      width: 100,
+      hideInSearch: false,
+      hideInTable: false,
+      valueEnum: statusEnum,
+      render: (text, record, index) => <StatusSwitch row={record} key={record.I_ID}
+                                                     updateStatus={updateTemplateStatus}/>
+    }, {
+      title: '最后修改时间',
+      dataIndex: 'D_DATE_EDIT',
+      valueType: 'dateTime',
+      width: 150,
+      hideInSearch: true,
+      hideInTable: false
+    }, {
       title: '操作',
       width: 150,
       hideInSearch: true,
@@ -123,18 +123,6 @@ const Applications: React.FC = () => {
       render: (_, record) => [   //render渲染 record代表当前行
         <>
           <a key={record.I_ID} onClick={() => isShowModal(true, record.I_ID)}>编辑</a>
-          <Divider type="vertical"/>
-          <Popconfirm key={record.I_ID} title="确认启用？" okText="确认" cancelText="取消" onConfirm={(e) => {
-            updateStatus(record.I_ID, record.V_STATUS, '1');
-          }}>
-            <a href="#">启用</a>
-          </Popconfirm>
-          <Divider type="vertical"/>
-          <Popconfirm key={record.I_ID} title="确认停用？" okText="确认" cancelText="取消" onConfirm={(e) => {
-            updateStatus(record.I_ID, record.V_STATUS, '0');
-          }}>
-            <a href="#">停用</a>
-          </Popconfirm>
           <Divider type="vertical"/>
           <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={(e) => {
             handleRemove(record.I_ID, record.V_URL);
@@ -149,13 +137,6 @@ const Applications: React.FC = () => {
           })}>下载</a>
         </>
       ]
-    }, {
-      title: '最后修改时间',
-      dataIndex: 'D_DATE_EDIT',
-      valueType: 'dateTime',
-      width: 150,
-      hideInSearch: true,
-      hideInTable: false
     }
   ];
 

@@ -87,7 +87,7 @@ const ViewLog = (props: any) => {
         ]}
       >
         <ProDescriptions.Item dataIndex="V_URL" span={2} label="请求路径"/>
-        <ProDescriptions.Item dataIndex="V_PARAMS" span={2} label="请求参数"/>
+        <ProDescriptions.Item dataIndex="V_PARAMS"  span={2} label="请求参数" valueType="jsonCode"/>
         <ProDescriptions.Item dataIndex="V_ERRMESSAGE" span={2} label="错误信息"/>
       </ProDescriptions>
     </Modal>

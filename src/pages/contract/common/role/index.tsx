@@ -8,6 +8,7 @@ import {statusEnum} from "@/utils/enum";
 import {deleteRole, selectRole, updateRoleStatus} from "@/services/contract/common/role";
 import UpdateRole from "@/pages/contract/common/role/components/UpdateRole";
 import {PlusOutlined} from "@ant-design/icons/lib";
+import StatusSwitch from "@/components/StatusSwitch";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
@@ -28,16 +29,6 @@ const Applications: React.FC = () => {
   useEffect(() => {
 
   }, []);
-
-  //修改状态
-  const updateStatus = async (id: any, V_STATUS: string, status: any) => {
-    if (V_STATUS === status) return;
-    const rep = await updateRoleStatus({I_ID: id, V_STATUS: status});
-    if (rep && rep.success) {
-      message.success('操作成功');
-      actionRef.current?.reloadAndRest?.(); //刷新Protable
-    }
-  };
 
   //删除角色
   const handleRemove = async (id: any) => {
@@ -78,6 +69,7 @@ const Applications: React.FC = () => {
       dataIndex: 'V_STATUS',
       width: 60,
       valueEnum: statusEnum,
+      render: (text, record, index) => <StatusSwitch row={record} key={record.I_ID} updateStatus={updateRoleStatus}/>
     }, {
       title: '操作',
       width: 180,
@@ -86,10 +78,6 @@ const Applications: React.FC = () => {
       render: (_, record) => [   //render渲染 record代表当前行
         <>
           <a key={record.I_ID} onClick={() => isShowModal(true, record.I_ID)}>编辑</a>
-          <Divider type="vertical"/>
-          <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '1')}>启用</a>
-          <Divider type="vertical"/>
-          <a key={record.I_ID} onClick={() => updateStatus(record.I_ID, record.V_STATUS, '0')}>停用</a>
           <Divider type="vertical"/>
           <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
             handleRemove(record.I_ID)
