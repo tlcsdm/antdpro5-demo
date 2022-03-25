@@ -1,5 +1,6 @@
 import Qs from "qs";
 import request from "@/utils/request";
+import {upload} from "@/utils/base";
 
 //加载合同
 export async function loadContract(params: any) {
@@ -9,7 +10,6 @@ export async function loadContract(params: any) {
   });
   return res;
 }
-
 
 //查询合同
 export async function selectContract(params: any) {
@@ -25,21 +25,13 @@ export async function selectContract(params: any) {
 }
 
 //新增合同
-export async function insertContract(params: any) {
-  const res = request('/api/contract-system/insertContract', {
-    method: 'POST',
-    data: Qs.stringify(params),
-  });
-  return res;
+export async function insertContract(formData: FormData) {
+  return upload('/api/contract-system/insertContract', formData);
 }
 
 //修改合同
-export async function updateContract(params: any) {
-  const res = request('/api/contract-system/updateContract', {
-    method: 'POST',
-    data: Qs.stringify(params),
-  });
-  return res;
+export async function updateContract(formData: FormData) {
+  return upload('/api/contract-system/updateContract', formData);
 }
 
 //删除合同
@@ -63,15 +55,6 @@ export async function startContractProcess(params: any) {
 //获得第一个用户任务节点
 export async function selectFirstTaskProcCandidate(params: any) {
   const res = request('/api/contract-system/selectFirstTaskProcCandidate', {
-    method: 'GET',
-    params: {...params}
-  });
-  return res;
-}
-
-//查询合同范本
-export async function selectTemplateAndType(params: any) {
-  const res = request('/api/contract-system/selectTemplateAndType', {
     method: 'GET',
     params: {...params}
   });

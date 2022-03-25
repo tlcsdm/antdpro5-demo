@@ -2,23 +2,28 @@ import React, {useEffect, useState} from 'react';
 import ProForm, {ModalForm} from '@ant-design/pro-form';
 import 'antd/dist/antd.min.css';
 import ProFormSelect from "@ant-design/pro-form/lib/components/Select";
+import {message} from "antd";
 
-const PreChooseFirstCandidate = (props: any) => {
+const PreChooseCandidate = (props: any) => {
   const {isCandidateModalVisible, isShowCandidateModal, candidateDataSource,setCandidate} = props;
   const [formObj] = ProForm.useForm(); // 定义Form实例, 用来操作表单
-  const [firstCandidateList, setFristCandidateList] = useState([]);
+  const [candidateList, setCandidateList] = useState([]);
+  const [temCandidate, setTempCandidate] = useState([]);
 
-  //查询第一步候选人
+  //查询候选人
   const onSelectCandidate = async () => {
     const candidateTempList: any = [];
     candidateDataSource.forEach(function (item: any) {
       const tempCandidate: any = {value: item.V_PERCODE, label: item.V_PERNAME};
       candidateTempList.push(tempCandidate);
     });
-    setFristCandidateList(candidateTempList);
+    setCandidateList(candidateTempList);
+    setTempCandidate(candidateTempList[0]);
 
     if (candidateDataSource.length > 0) {
       formObj.setFieldsValue({['V_CANDIDATE']: candidateDataSource[0].V_PERCODE});
+    }else{
+      message.info('未找到下一步审批人!');
     }
   };
 
@@ -26,6 +31,10 @@ const PreChooseFirstCandidate = (props: any) => {
   useEffect(() => {
     onSelectCandidate();
   }, []);
+
+  const onChangeCandidate = (value: any) => {
+    setTempCandidate(value);
+  };
 
   return (
     <ModalForm
@@ -36,13 +45,13 @@ const PreChooseFirstCandidate = (props: any) => {
       visible={isCandidateModalVisible} //显示或隐藏
       onVisibleChange={isShowCandidateModal} //设置显示或隐藏
       onFinish={async (value) => { //表单提交 value表单中的值
-        setCandidate(value);
+        setCandidate(temCandidate);
         isShowCandidateModal(false);
       }}
     >
       <ProForm.Group>
         <ProFormSelect
-          options={firstCandidateList}
+          options={candidateList}
           width="sm"
           name="V_CANDIDATE"
           label="下一步审批人"
@@ -52,9 +61,15 @@ const PreChooseFirstCandidate = (props: any) => {
               message: '下一步审批人为必填项',
             },
           ]}
+          fieldProps={{
+            onChange(value, options) {
+              // @ts-ignore
+              onChangeCandidate(options);
+            }
+          }}
         />
       </ProForm.Group>
     </ModalForm>
   );
 };
-export default PreChooseFirstCandidate;
+export default PreChooseCandidate;

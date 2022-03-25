@@ -1,5 +1,5 @@
 import {PageContainer} from '@ant-design/pro-layout';
-import React, {FC} from 'react';
+import React, {FC, useEffect} from 'react';
 import {history} from 'umi';
 import {useModel} from "@@/plugin-model/useModel";
 
@@ -36,6 +36,18 @@ const Search: FC<SearchProps> = (props) => {
     return tabList;
   };
 
+  //处理无公用，默认的页签页时的路由判断
+  useEffect(() => {
+    // @ts-ignore
+    if (menuList && menuList?.includes(props.match.url + '/approval')) {
+      history.push(props.match.url + '/approval');
+    } else { // @ts-ignore
+      if (menuList && menuList?.includes(props.match.url + '/revise')) {
+        history.push(props.match.url + '/revise');
+      }
+    }
+  }, []);
+
   const handleTabChange = (key: string) => {
     const {match} = props;
     const url = match.url === '/' ? '' : match.url;
@@ -63,6 +75,7 @@ const Search: FC<SearchProps> = (props) => {
 
   return (
     <PageContainer
+      ghost
       title={false}
       tabList={getTabList()}
       tabActiveKey={getTabKey()}

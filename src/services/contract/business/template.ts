@@ -11,6 +11,24 @@ export async function loadTemplate(params: any) {
   return res;
 }
 
+//根据合同模板获取html
+export async function loadTemplateHtmlByWord(params: any) {
+  const res = request('/api/contract-system/loadTemplateHtmlByWord', {
+    method: 'GET',
+    params: {...params}
+  });
+  return res;
+}
+
+//加载模板html代码
+export async function loadTemplateHtml(params: any) {
+  const res = request('/api/contract-system/loadTemplateHtml', {
+    method: 'GET',
+    params: {...params}
+  });
+  return res;
+}
+
 //查询模板
 export async function selectTemplate(params: any) {
   /*

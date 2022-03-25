@@ -6,6 +6,7 @@ import {deleteMenu, selectMenu, selectMenuTree} from '@/services/contract/common
 import ProCard from '@ant-design/pro-card';
 import ProTable, {ProColumns} from "@ant-design/pro-table";
 import {PageContainer} from "@ant-design/pro-layout";
+import {iconMap} from "@/utils/iconMap";
 
 const Applications: React.FC = () => {
   const [isMenuModalVisible, setIsMenuModalVisible] = useState(false);
@@ -116,7 +117,8 @@ const Applications: React.FC = () => {
     {
       title: '菜单图标',
       dataIndex: 'V_ADDRESS_ICO',
-      width: 70
+      width: 70,
+      render: (text, record, index) => iconMap[`${text}`]
     },
     // {
     //   title: '系统编码',

@@ -23,7 +23,7 @@ const ViewLog = (props: any) => {
       title={'查看日志'}
       width="1200px"
       visible={isModalVisible}
-      footer={[<Button key="close" type="primary" onClick={handleCancel}>关闭</Button>,]}
+      footer={[<Button key="close" type="primary" onClick={handleCancel}>关闭</Button>]}
       onCancel={handleCancel}
     >
       <ProDescriptions
@@ -87,7 +87,7 @@ const ViewLog = (props: any) => {
         ]}
       >
         <ProDescriptions.Item dataIndex="V_URL" span={2} label="请求路径"/>
-        <ProDescriptions.Item dataIndex="V_PARAMS"  span={2} label="请求参数" valueType="jsonCode"/>
+        <ProDescriptions.Item dataIndex="V_PARAMS" span={2} label="请求参数" valueType="jsonCode"/>
         <ProDescriptions.Item dataIndex="V_ERRMESSAGE" span={2} label="错误信息"/>
       </ProDescriptions>
     </Modal>

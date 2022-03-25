@@ -1,5 +1,5 @@
 // @ts-ignore
-import { Settings as LayoutSettings } from '@ant-design/pro-layout';
+import {Settings as LayoutSettings} from '@ant-design/pro-layout';
 
 const Settings: LayoutSettings & {
   pwa?: boolean;
@@ -13,7 +13,7 @@ const Settings: LayoutSettings & {
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: '鞍钢合同系统',
+  title: '鞍钢矿业合同系统',
   pwa: false,
   logo: '/favicon.ico',
   iconfontUrl: '',

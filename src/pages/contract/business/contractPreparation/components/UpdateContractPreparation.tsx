@@ -1,6 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {Button, message} from 'antd';
-import ProForm, {ModalForm, ProFormDatePicker, ProFormDigit, ProFormSelect, ProFormText} from '@ant-design/pro-form';
+import {Button, Card, message} from 'antd';
+import ProForm, {
+  DrawerForm,
+  ProFormDatePicker,
+  ProFormDigit,
+  ProFormMoney,
+  ProFormSelect,
+  ProFormText,
+  ProFormUploadDragger
+} from '@ant-design/pro-form';
 import 'antd/dist/antd.min.css';
 import {
   insertContract,
@@ -12,16 +20,19 @@ import {
 import moment from "moment";
 import {selectMajor} from "@/services/contract/business/major";
 import {useModel} from "@@/plugin-model/useModel";
-import ProFormUploadButton from "@ant-design/pro-form/lib/components/UploadButton";
 import PreChooseSponsor from "@/components/Choose/PreChooseSponsor";
 import PreChooseContractor from "@/components/Choose/PreChooseContractor";
 import {contractTypeOpinion} from "@/utils/enum";
-import PreChooseFirstCandidate from "@/components/Choose/PreChooseFirstCandidate";
+import PreChooseCandidate from "@/components/Choose/PreChooseCandidate";
 import {selectMajorToFlow} from "@/services/contract/business/majorToFlow";
 import PreChooseTemplate from "@/components/Choose/PreChooseTemplate";
+import {loadTemplateHtml} from "@/services/contract/business/template";
+import {loadContractFileJson} from "@/services/contract/business/contractFile";
+import {selectDictionary} from '@/services/contract/common/dictionary';
+import PreChooseContract from "@/components/Choose/PreChooseContract";
 
 const UpdateContractPreparation = (props: any) => {
-  const {isModalVisible, isShowModal, actionRef, contractId} = props;
+  const {isModalVisible, isShowModal, actionRef, contractId, contractType} = props;
   const [contract, setContract] = useState(undefined);// 将表单初始化的值设置成状态, 在编辑的时候, 使用这个状态
   const [formObj] = ProForm.useForm(); // 定义Form实例, 用来操作表单
   const {initialState} = useModel('@@initialState');
@@ -29,14 +40,17 @@ const UpdateContractPreparation = (props: any) => {
   const [isSponsorModalVisible, setIsSponsorModalVisible] = useState(false);
   const [isContractorModalVisible, setIsContractorModalVisible] = useState(false);
   const [isTemplateModalVisible, setIsTemplateModalVisible] = useState(false);
+  const [isContractModalVisible, setIsContractModalVisible] = useState(false);
   const [isCandidateModalVisible, setIsCandidateModalVisible] = useState(false);
   const [contractor, setContractor] = useState(undefined);
   const [sponsor, setSponsor] = useState(undefined);
   const [template, setTemplate] = useState(undefined);
+  const [contractList, setContractList] = useState(undefined);
   const [candidateDataSource, setCandidateDataSource] = useState([]);
   const [candidate, setCandidate] = useState(undefined);
   const [processDefinitionKey, setProcessDefinitionKey] = useState(undefined);
   const [businessId, setBusinessId] = useState(undefined);
+  const [html, setHtml] = useState('');
 
   const isShowSponsorModal = (show: boolean | ((prevState: boolean) => boolean)) => {
     setIsSponsorModalVisible(show);
@@ -54,7 +68,11 @@ const UpdateContractPreparation = (props: any) => {
     setIsTemplateModalVisible(show);
   };
 
-  //接收作业区
+  const isShowContractModal = (show: boolean | ((prevState: boolean) => boolean)) => {
+    setIsContractModalVisible(show);
+  };
+
+  //专业
   const [majorList, setMajorList] = useState([]);
   const onSelectMajor = async () => {
     const deptMarjorList = await selectMajor({
@@ -68,6 +86,20 @@ const UpdateContractPreparation = (props: any) => {
     setMajorList(deptMajorTempList);
   };
 
+  //合同项目类型
+  const [projectTypeList, setProjectTypeList] = useState([]);
+  const onSelectProjectType = async () => {
+    const projectTypeList = await selectDictionary({
+      V_DICTIONARYTYPE: '合同项目类型',
+    });
+    const projectTypeTempList: any = [];
+    projectTypeList.data.forEach(function (item: any) {
+      const tempProjectType: any = {value: item.V_CODE, label: item.V_NAME};
+      projectTypeTempList.push(tempProjectType);
+    });
+    setProjectTypeList(projectTypeTempList);
+  };
+
   //修改时初始化数据
   const initContract = async () => {
     const response = await loadContract({I_ID: contractId});
@@ -75,14 +107,48 @@ const UpdateContractPreparation = (props: any) => {
     const contractData = response.data;
     setContract({...response.data});
     Object.keys(contractData).forEach(key => formObj.setFieldsValue({[`${key}`]: contractData[key]}));
+    //模版初始化
+    const resp = await loadTemplateHtml({
+      I_ID: contractData['V_TEMPLATEID']
+    });
+    const V_HTML = resp.data.V_HTML && decodeURIComponent(resp.data.V_HTML);
+    setHtml(V_HTML);
+    //初始化模版值
+    const res = await loadContractFileJson({
+      V_GUID: contractData['I_ID']
+    });
+    if (!res.data || !res.data.V_JSON) return;
+    let json = JSON.parse(res.data.V_JSON);
+    let index = V_HTML.indexOf('contenteditable="true"');
+    let sum = 0;
+    while (index > -1) {
+      index = V_HTML.indexOf('contenteditable="true"', index + 1);
+      sum++
+    }
+    for (let i = 0; i < sum; i++) {
+      let key = 'CON_' + (i + 1);
+      let sp = document.querySelector('#' + key) as HTMLInputElement;
+      if (json[key] && json[key] !== '') {
+        //优化显示
+        if (sp.innerText.length > json[key].length) {
+          sp.innerText = json[key] + sp.innerText.substring(json[key].length - 1);
+        } else {
+          sp.innerText = json[key];
+        }
+      }
+    }
   };
 
   //初始化
   useEffect(() => {
     onSelectMajor();
+    onSelectProjectType();
     if (contractId !== undefined) {
       initContract();
     }
+    formObj.setFieldsValue({
+      V_CONTRACTTYPE: contractType
+    });
   }, []);
 
   // @ts-ignore
@@ -109,8 +175,23 @@ const UpdateContractPreparation = (props: any) => {
       formObj.setFieldsValue({
         V_TEMPLATE: (template as any).V_NAME
       });
+      const response = await loadTemplateHtml({
+        I_ID: (template as any).V_TEMPLATEID,
+      });
+      if (response && response.success) {
+        setHtml(response.data.V_HTML && decodeURIComponent(response.data.V_HTML));
+      }
     }
   }, [template]);
+
+  // @ts-ignore
+  useEffect(async () => {
+    if (contractList !== undefined) {
+      formObj.setFieldsValue({
+        V_CONTRACTUPID: (contractList as any)[0].I_ID
+      });
+    }
+  }, [contractList]);
 
   // @ts-ignore
   useEffect(async () => {
@@ -124,26 +205,48 @@ const UpdateContractPreparation = (props: any) => {
     const hide = message.loading('处理中...');
     let response = [];
     // 对提交后端数据处理
-    const newFields = {};
-    Object.assign(newFields, fields);
-    newFields['V_SPONSORID'] = sponsor !== undefined ? (sponsor as any).I_ID : (contract as any).V_SPONSORID;
-    newFields['V_SPONSORCODE'] = sponsor !== undefined ? (sponsor as any).V_SPONSORCODE : (contract as any).V_SPONSORCODE;
-    newFields['V_CONTRACTORID'] = contractor !== undefined ? (contractor as any).I_ID : (contract as any).V_CONTRACTORID;
-    newFields['V_TEMPLATEID'] =template !== undefined ? (template as any).I_ID : (contract as any).V_TEMPLATEID;
-    newFields['V_YEAR'] = moment(fields.V_YEAR).format('YYYY');
-    if (contract === undefined) {
-      response = await insertContract({...newFields});
-    } else {
-      newFields['V_STARTDATE'] = moment(fields.V_STARTDATE).format('YYYY-MM-DD');
-      newFields['V_ENDDATE'] = moment(fields.V_ENDDATE).format('YYYY-MM-DD');
-      response = await updateContract({I_ID: (contract as any).I_ID, ...newFields});
-    }
-    // TODO 合同附件上传
     const formData = new FormData();
-    fileList.forEach(file => {
+    fileList.forEach(file => {// 合同附件上传
       formData.append('multipartFiles', (file as any).originFileObj);
     });
-
+    Object.keys(fields).forEach(function (key) {
+      if (`${key}` !== 'V_YEAR' && `${key}` !== 'V_STARTDATE' && `${key}` !== 'V_ENDDATE') {
+        formData.append(`${key}`, fields[key]);
+      }
+    });
+    formData.append('V_SPONSORID', sponsor !== undefined ? (sponsor as any).I_ID : (contract as any).V_SPONSORID);
+    formData.append('V_SPONSORCODE', sponsor !== undefined ? (sponsor as any).V_SPONSORCODE : (contract as any).V_SPONSORCODE);
+    formData.append('V_SPONSORABBR', sponsor !== undefined ? (sponsor as any).V_SIMPLENAME : (contract as any).V_SPONSORABBR);
+    formData.append('V_CONTRACTORID', contractor !== undefined ? (contractor as any).CONTRACTOR_ID : (contract as any).V_CONTRACTORID);
+    formData.append('V_TEMPLATEID', template !== undefined ? (template as any).V_TEMPLATEID : (contract as any).V_TEMPLATEID);
+    formData.append('V_YEAR', moment(fields.V_YEAR).format('YYYY'));
+    formData.append('V_STARTDATE', moment(fields.V_STARTDATE).format('YYYY-MM-DD'));
+    formData.append('V_ENDDATE', moment(fields.V_ENDDATE).format('YYYY-MM-DD'));
+    //组装json
+    let index = html.indexOf('contenteditable="true"');
+    let sum = 0;
+    while (index > -1) {
+      index = html.indexOf('contenteditable="true"', index + 1);
+      sum++
+    }
+    let json = '{';
+    for (let i = 0; i < sum; i++) {
+      let key = 'CON_' + (i + 1);
+      let sp = document.querySelector('#' + key) as HTMLInputElement;
+      let cont = sp.innerText.trim();
+      json += ('"' + key + '": ' + (cont.length > 0 ? '"' + sp.innerText.trim() + '"' : '""'));
+      if (i !== sum - 1) {
+        json += ',';
+      }
+    }
+    json += '}';
+    formData.append('V_JSON', json);
+    if (contract === undefined) {
+      response = await insertContract(formData);
+    } else {
+      formData.append('I_ID', (contract as any).I_ID);
+      response = await updateContract(formData);
+    }
     hide();
     if (response && response.success) {
       message.success("操作成功");
@@ -181,12 +284,12 @@ const UpdateContractPreparation = (props: any) => {
     const hide = message.loading('处理中...');
     let response = await startContractProcess({
       I_ID: businessId,
-      ASSIGNEE_: 'EMP[' + (candidate as any).V_CANDIDATE + ']',
+      ASSIGNEE_: 'EMP[' + (candidate as any).value + ']',
       PROCESS_DEFINITION_KEY_: processDefinitionKey
     });
     hide();
     if (response && response.success) {
-      message.success("操作成功");
+      message.success("操作成功! [上报成功! 下一步流程处理人:" + (candidate as any).label + ']');
       isShowModal(false);
       if (actionRef.current) {
         actionRef.current.reload();  //提交后刷新Protable
@@ -213,13 +316,16 @@ const UpdateContractPreparation = (props: any) => {
   };
 
   return (
-    <ModalForm
+    <DrawerForm
       form={formObj} //const [formObj] = ProForm.useForm(); // 定义Form实例, 用来操作表单
       title={(contract !== undefined ? "修改" : "新增")}
-      width="800px"
+      width={0.9 * document.body.clientWidth}
       labelAlign={"right"} //文本框前面名称的位置
       visible={isModalVisible} //显示或隐藏
       onVisibleChange={isShowModal} //设置显示或隐藏
+      drawerProps={{
+        maskClosable: false
+      }}
       onFinish={async (value) => { //表单提交 value表单中的值
         const success = await handleSubmit(value);
         if (success) {
@@ -248,7 +354,7 @@ const UpdateContractPreparation = (props: any) => {
       <ProForm.Group>
         <ProFormText
           label="项目编号"
-          width="sm"
+          width="md"
           name="V_PROJECTCODE"
           //readonly={(contract !== undefined)}
           rules={[
@@ -259,23 +365,8 @@ const UpdateContractPreparation = (props: any) => {
           ]}
         />
         <ProFormText
-          label="合同模版"
-          width="sm"
-          name="V_TEMPLATE"
-          rules={[
-            {
-              required: true,
-              message: '合同模版为必填项'
-            }
-          ]}
-          addonAfter={<a onClick={() => isShowTemplateModal(true)}>选择</a>}
-        />
-      </ProForm.Group>
-
-      <ProForm.Group>
-        <ProFormText
           label="项目名称"
-          width="sm"
+          width="md"
           name="V_PROJECTNAME"
           rules={[
             {
@@ -285,25 +376,38 @@ const UpdateContractPreparation = (props: any) => {
           ]}
         />
         <ProFormText
-          label="定作方"
-          width="sm"
-          name="V_SPONSORNAME"
+          label="合同模版"
+          width="md"
+          name="V_TEMPLATE"
+          disabled
+          placeholder={'请选择'}
           rules={[
             {
               required: true,
-              message: '定作方为必填项'
+              message: '合同模版为必填项'
             }
           ]}
-          addonAfter={<a onClick={() => isShowSponsorModal(true)}>选择</a>}
+          addonAfter={<a onClick={() => isShowTemplateModal(true)}>选择</a>}
         />
       </ProForm.Group>
-
       <ProForm.Group>
-        <ProFormDigit
-          label="金额"
-          width="sm"
+        <ProFormText
+          label="合同编码"
+          width="md"
+          name="V_CONTRACTCODE"
+          rules={[
+            {
+              required: true,
+              message: '合同编码为必填项'
+            }
+          ]}
+        />
+        <ProFormMoney
+          label="金额(元)"
+          width="md"
           name="V_MONEY"
           initialValue={0}
+          locale="zh-CN"
           min={0}
           fieldProps={{precision: 2}}
           rules={[
@@ -314,23 +418,24 @@ const UpdateContractPreparation = (props: any) => {
           ]}
         />
         <ProFormText
-          label="承揽方"
-          width="sm"
-          name="V_CONTRACTORNAME"
+          label="定制方"
+          width="md"
+          name="V_SPONSORNAME"
+          disabled
+          placeholder={'请选择'}
           rules={[
             {
               required: true,
-              message: '承揽方为必填项'
+              message: '定作方为必填项'
             }
           ]}
-          addonAfter={<a onClick={() => isShowContractorModal(true)}>选择</a>}
+          addonAfter={<a onClick={() => isShowSponsorModal(true)}>选择</a>}
         />
       </ProForm.Group>
-
       <ProForm.Group>
         <ProFormDatePicker
-          width="sm"
           name="V_STARTDATE"
+          width="md"
           label="履行起始时间"
           rules={[
             {
@@ -341,8 +446,8 @@ const UpdateContractPreparation = (props: any) => {
           initialValue={moment()}
         />
         <ProFormDatePicker
-          width="sm"
           name="V_ENDDATE"
+          width="md"
           label="履行终止时间"
           rules={[
             {
@@ -352,12 +457,25 @@ const UpdateContractPreparation = (props: any) => {
           ]}
           initialValue={moment()}
         />
+        <ProFormText
+          label="承揽方"
+          width="md"
+          name="V_CONTRACTORNAME"
+          disabled
+          placeholder={'请选择'}
+          rules={[
+            {
+              required: true,
+              message: '承揽方为必填项'
+            }
+          ]}
+          addonAfter={<a onClick={() => isShowContractorModal(true)}>选择</a>}
+        />
       </ProForm.Group>
-
       <ProForm.Group>
         <ProFormDatePicker.Year
-          width="sm"
           name="V_YEAR"
+          width="md"
           label="计划年份"
           initialValue={Date.now()}
           rules={[
@@ -368,9 +486,9 @@ const UpdateContractPreparation = (props: any) => {
           ]}/>
         <ProFormDigit
           label="合同份数"
-          width="sm"
+          width="md"
           name="I_COPIES"
-          initialValue={0}
+          initialValue={6}
           min={0}
           fieldProps={{precision: 0}}
           rules={[
@@ -380,14 +498,11 @@ const UpdateContractPreparation = (props: any) => {
             },
           ]}
         />
-      </ProForm.Group>
-
-      <ProForm.Group>
         <ProFormDigit
           label="签审份数"
-          width="sm"
+          width="md"
           name="I_REVIEWCOPIES"
-          initialValue={0}
+          initialValue={3}
           min={0}
           fieldProps={{precision: 0}}
           rules={[
@@ -397,24 +512,52 @@ const UpdateContractPreparation = (props: any) => {
             },
           ]}
         />
+      </ProForm.Group>
+      <ProForm.Group>
         <ProFormText
-          label="合同编码"
-          width="sm"
-          name="V_CONTRACTCODE"
+          label="合同履行类型"
+          width="md"
+          name="V_CONTRACTTYPE"
+          disabled
           rules={[
             {
               required: true,
-              message: '合同编码为必填项'
+              message: '合同履行类型为必填项'
             }
           ]}
         />
+        <ProFormSelect
+          options={projectTypeList}
+          name="V_PROJECTTYPE"
+          width="md"
+          label="合同项目类型"
+          rules={[
+            {
+              required: true,
+              message: '合同项目类型为必填项',
+            },
+          ]}
+        />
+        <ProFormText
+          label="关联合同"
+          width="md"
+          name="V_CONTRACTUPID"
+          disabled
+          placeholder={'请选择'}
+          rules={[
+            {
+              required: formObj.getFieldsValue(['V_CONTRACTTYPE']).V_CONTRACTTYPE !== '新建合同',
+              message: '关联合同为必填项'
+            }
+          ]}
+          addonAfter={(formObj.getFieldsValue(['V_CONTRACTTYPE']).V_CONTRACTTYPE !== '新建合同')&&<a onClick={() => isShowContractModal(true)}>选择</a>}
+        />
       </ProForm.Group>
-
       <ProForm.Group>
         <ProFormSelect
           options={contractTypeOpinion}
-          width="sm"
           name="V_ACCORDANCE"
+          width="md"
           label="合同类型"
           rules={[
             {
@@ -422,11 +565,12 @@ const UpdateContractPreparation = (props: any) => {
               message: '合同类型为必填项',
             },
           ]}
+          initialValue={'议标'}
         />
         <ProFormSelect
           options={majorList}
-          width="sm"
           name="V_MAJORID"
+          width="md"
           label="所属专业"
           rules={[
             {
@@ -435,13 +579,10 @@ const UpdateContractPreparation = (props: any) => {
             },
           ]}
         />
-      </ProForm.Group>
-
-      <ProForm.Group>
-        <ProFormUploadButton
+        <ProFormUploadDragger
           {...fileProps}
           label="附件"
-          title="上传文件"
+          width="md"
           getValueFromEvent={normFile}
           fieldProps={{multiple: true}}
         />
@@ -476,7 +617,7 @@ const UpdateContractPreparation = (props: any) => {
         !isCandidateModalVisible ? (
           ''
         ) : (
-          <PreChooseFirstCandidate
+          <PreChooseCandidate
             isCandidateModalVisible={isCandidateModalVisible}
             isShowCandidateModal={isShowCandidateModal}
             candidateDataSource={candidateDataSource}
@@ -496,7 +637,23 @@ const UpdateContractPreparation = (props: any) => {
           />
         )
       }
-    </ModalForm>
+      {
+        // 模态框隐藏的时候, 不挂载组件; 模态显示时候再挂载组件, 这样是为了触发子组件的生命周期
+        !isContractModalVisible ? (
+          ''
+        ) : (
+          <PreChooseContract
+            isContractModalVisible={isContractModalVisible}
+            isShowContractModal={isShowContractModal}
+            setContractList={setContractList}
+          />
+        )
+      }
+      <Card>
+        <div dangerouslySetInnerHTML={{__html: html}}>
+        </div>
+      </Card>
+    </DrawerForm>
   );
 };
 export default UpdateContractPreparation;

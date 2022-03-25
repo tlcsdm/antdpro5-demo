@@ -7,7 +7,7 @@ import {ProFormInstance} from '@ant-design/pro-form';
 import {PlusOutlined} from "@ant-design/icons/lib";
 import {selectProcessDefinition} from "@/services/contract/business/processDefinition";
 import InsertProcessDefinition from "@/pages/contract/business/processDefinition/components/InsertProcessDefinition";
-import ViewProcessDefinitionDiagram from './components/ViewProcessDefinitionDiagram';
+import ViewProcessDefinitionDiagram from '../../../../components/View/ViewProcessDefinitionDiagram';
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {

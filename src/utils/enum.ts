@@ -49,6 +49,16 @@ export const activityStatus = {
   0: {text: '审批中', status: 'Processing'},
   2: {text: '审批驳回', status: 'Error'},
   3: {text: '未审批', status: 'Default'},
+  4: {text: '撤审', status: 'Error'},
+};
+
+//流程状态
+export const activityStatusMap = {
+  0: '审批中',
+  1: '审批通过',
+  2: '审批驳回',
+  3: '未审批',
+  4: '撤审',
 };
 
 //合同类型
@@ -57,3 +67,10 @@ export const contractTypeOpinion = [
   {label: '中标', value: '中标'},
   {label: '关联审批', value: '关联审批'}
 ];
+
+//盖章状态
+export const stampStatus = {
+  1: {text: '预约申请中', status: 'Processing'},
+  2: {text: '已预约确认', status: 'Default'},
+  3: {text: '已盖章', status: 'Success'},
+};

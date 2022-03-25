@@ -1,13 +1,13 @@
 import React, {useCallback} from 'react';
 import {LogoutOutlined} from '@ant-design/icons';
-import {Menu, Spin} from 'antd';
+import {Menu, message, Spin} from 'antd';
 import {history, useModel} from 'umi';
 import {stringify} from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 import {MenuInfo} from 'rc-menu/lib/interface';
 import Cookies from 'js-cookie'
-import {EditOutlined, ProfileOutlined} from "@ant-design/icons/lib";
+import {ClearOutlined, EditOutlined, ProfileOutlined} from "@ant-design/icons/lib";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -42,6 +42,11 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu}) => {
       if (key === 'logout' && initialState) {
         setInitialState({...initialState, currentUser: undefined});
         loginOut();
+        return;
+      } else if (key === 'clearCaches') {
+        localStorage.removeItem("con_person");
+        localStorage.removeItem("con_menu");
+        message.success("已清空缓存");
         return;
       }
       history.push(`/personalcenter/${key}`);
@@ -84,6 +89,12 @@ const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({menu}) => {
         <Menu.Item key="updatePass">
           <EditOutlined/>
           修改密码
+        </Menu.Item>
+      )}
+      {menu && (
+        <Menu.Item key="clearCaches">
+          <ClearOutlined/>
+          清除缓存
         </Menu.Item>
       )}
       {menu && <Menu.Divider/>}

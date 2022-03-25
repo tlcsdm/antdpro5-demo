@@ -22,7 +22,7 @@
     routes: [
       {
         path: '/personalcenter',
-        redirect: '/personalcenter/todo/approval',
+        redirect: '/personalcenter/todo',
       },
       {
         name: '待办任务',
@@ -31,10 +31,6 @@
         component: './contract/person/todo',
         access: 'hasRoute',
         routes: [
-          {
-            path: '/personalcenter/todo',
-            redirect: '/personalcenter/todo/approval',
-          },
           {
             name: '待审批的合同',
             path: '/personalcenter/todo/approval',
@@ -48,6 +44,12 @@
             access: 'hasRoute',
           },
           {
+            name: '查看审批意见',
+            path: '/personalcenter/todo/memo/:bizId/:processInstanceId',
+            hideInMenu: true,
+            component: './contract/person/todo/approvalMemo',
+          },
+          {
             component: './404',
           },
         ],
@@ -56,7 +58,7 @@
         name: '已办任务',
         icon: 'fileDone',
         path: '/personalcenter/done',
-        component: './Welcome',
+        component: './contract/person/done',
         access: 'hasRoute',
       },
       {
@@ -100,7 +102,7 @@
     routes: [
       {
         path: '/business',
-        component: './Welcome',
+        component: './contract/workplace',
       },
       {
         name: '定作方管理',
@@ -186,6 +188,20 @@
         access: 'hasRoute',
       },
       {
+        name: '合同查询打印',
+        icon: 'team',
+        path: '/business/contractList',
+        component: './contract/business/viewContractInfo',
+        access: 'hasRoute',
+      },
+      {
+        name: '预约签章',
+        icon: 'team',
+        path: '/business/contractStamp',
+        component: './contract/business/contractStamp',
+        access: 'hasRoute',
+      },
+      {
         component: './404',
       },
     ],
@@ -198,7 +214,7 @@
     routes: [
       {
         path: '/system',
-        component: './Welcome',
+        component: './contract/workplace',
       },
       {
         name: '字典管理',
@@ -335,7 +351,11 @@
   {
     path: '/',
     //redirect: '/personalcenter/todo',
-    component: './Welcome',
+    component: './contract/workplace',
+  },
+  {
+    path: '/pdfPreview',
+    component: './contract/common/pdfPreview',
   },
   {
     component: './404',

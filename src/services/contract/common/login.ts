@@ -14,7 +14,7 @@ export async function login(params: any) {
 export async function currentUser(options?: { [key: string]: any }) {
   return request<{
     data: API.CurrentUser;
-  }>('/api/contract-system/loadPersonByCode', {
+  }>('/api/contract-system/loadEmpInfoByEmpCode', {
     method: 'GET',
     ...(options || {}),
   });

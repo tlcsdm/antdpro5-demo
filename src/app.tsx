@@ -10,6 +10,7 @@ import Cookies from "js-cookie";
 import {selectPersonMenuTree} from "@/services/contract/common/menu";
 import {iconMap} from "@/utils/iconMap";
 import {getLocalStorage, setLocalStorage} from "@/utils/Storage";
+// import {Input} from 'antd';
 
 // const isDev = process.env.NODE_ENV === 'development';
 // const {REACT_APP_ENV} = process.env;
@@ -144,6 +145,17 @@ export const layout: RunTimeLayoutConfig = ({initialState, setInitialState}) => 
     //   ]
     //   : [],
     menuDataRender: () => menuDataRender(initialState?.menuData), //加载菜单数据
+    // menuExtraRender: () => {
+    //   return (
+    //     <>
+    //       <Input.Search
+    //         onSearch={() => {
+    //           alert(1)
+    //         }}
+    //       />
+    //     </>
+    //   );
+    // },
     //menuHeaderRender: undefined,
     // 自定义 403 页面
     //unAccessible: <div>unAccessible</div>,

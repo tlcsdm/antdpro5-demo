@@ -91,6 +91,17 @@ const UpdateSponsor = (props: any) => {
       </ProForm.Group>
       <ProForm.Group>
         <ProFormText
+          label="定作方简称"
+          width="lg"
+          name="V_SIMPLENAME"
+          rules={[
+            {
+              required: true,
+              message: '定作方简称为必填项'
+            }
+          ]}
+        />
+        <ProFormText
           label="定作方法人"
           width="lg"
           name="V_OFFICER"
@@ -101,6 +112,8 @@ const UpdateSponsor = (props: any) => {
             }
           ]}
         />
+      </ProForm.Group>
+      <ProForm.Group>
         <ProFormText
           label="电话号码"
           width="lg"
@@ -112,8 +125,6 @@ const UpdateSponsor = (props: any) => {
             }
           ]}
         />
-      </ProForm.Group>
-      <ProForm.Group>
         <ProFormDigit
           label="显示顺序"
           width="lg"

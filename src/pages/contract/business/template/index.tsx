@@ -5,24 +5,40 @@ import {PageContainer} from '@ant-design/pro-layout';
 import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
 import 'moment/locale/zh-cn'
 import UpdateTemplate from "./components/UpdateTemplate";
-import {ProFormInstance} from '@ant-design/pro-form';
+import {ModalForm, ProFormInstance} from '@ant-design/pro-form';
 import {
   deleteTemplate,
   downloadTemplate,
+  loadTemplateHtml,
+  loadTemplateHtmlByWord,
   selectTemplate,
   updateTemplateStatus
 } from "@/services/contract/business/template";
 import {selectTemplateType} from "@/services/contract/business/templateType";
 import {statusEnum} from "@/utils/enum";
 import StatusSwitch from "@/components/StatusSwitch";
+import ViewHtml from "@/components/View/ViewHtml";
+import ProDescriptions from "@ant-design/pro-descriptions";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isHtmlModalVisible, setIsHtmlModalVisible] = useState(false);
   const [templateId, setTemplateId] = useState(undefined);
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
   const [templateTypeList, setTemplateTypeList] = useState([]);//模板类型
+  const [isViewSafeDataModalVisible, setIsViewSafeDataModalVisible] = useState(false);
+  const [html, setHtml] = useState('');
+  const [word2html, setWord2html] = useState(undefined);
+
+  const handleCancel = () => {
+    setIsViewSafeDataModalVisible(false);
+  };
+
+  const handleCancelHtml = (show: boolean | ((prevState: boolean) => boolean)) => {
+    setIsHtmlModalVisible(show);
+  };
 
   /**
    * 控制模态框显示和隐藏
@@ -30,6 +46,15 @@ const Applications: React.FC = () => {
   const isShowModal = (show: boolean | ((prevState: boolean) => boolean), id = undefined) => {
     setTemplateId(id);
     setIsModalVisible(show);
+  };
+
+  /**
+   * 控制模态框显示和隐藏
+   */
+  const isShowHtmlModal = async (show: boolean | ((prevState: boolean) => boolean), id = undefined) => {
+    const response = await loadTemplateHtmlByWord({I_ID: id});
+    setWord2html({...response.data});
+    setIsHtmlModalVisible(show);
   };
 
   //查询模板类型
@@ -48,6 +73,10 @@ const Applications: React.FC = () => {
   //useEffect参数为空数组时仅初始化执行一次
   useEffect(() => {
     initTemplateType();
+    //contenteditable="true"
+    // const reg = /^\s+|\s+$/g;
+    // document.getElementById('V1').innerText
+    // document.getElementById('V1').innerText.replace(reg,'');
   }, []);
 
   //删除合同模版
@@ -62,6 +91,18 @@ const Applications: React.FC = () => {
     message.success('删除成功，即将刷新');
     actionRef.current?.reloadAndRest?.(); //刷新Protable
     return true;
+  };
+
+  const viewTemplate = async (id: string) => {
+    if (!id) return;
+    const hide = message.loading('加载中...');
+    const response = await loadTemplateHtml({
+      I_ID: id,
+    });
+    hide();
+    if (response && response.success) {
+      setHtml(response.data.V_HTML && decodeURIComponent(response.data.V_HTML).replace(/contenteditable="true"/g, ''));
+    }
   };
 
   const columns: ProColumns[] = [  //定义 Protable的列 columns放在Protable
@@ -93,16 +134,19 @@ const Applications: React.FC = () => {
       hideInTable: false
     }, {
       title: '模板查看',
-      width: 100,
+      width: 60,
       hideInSearch: true,
       valueType: 'option',  //操作列的类型
       render: (_, record) => [   //render渲染 record代表当前行
-        <a key={record.I_ID} /*onClick={() => isViewShowModal(true, record.I_ID)}*/>查看</a>,
+        <a key={record.I_ID} onClick={() => {
+          viewTemplate(record.I_ID);
+          setIsViewSafeDataModalVisible(true)
+        }}>查看</a>
       ]
     }, {
       title: '状态',
       dataIndex: 'V_STATUS',
-      width: 100,
+      width: 80,
       hideInSearch: false,
       hideInTable: false,
       valueEnum: statusEnum,
@@ -135,6 +179,8 @@ const Applications: React.FC = () => {
             V_URL: record.V_URL,
             V_FILENAME: record.V_FILENAME,
           })}>下载</a>
+          <Divider type="vertical"/>
+          <a key={record.I_ID} onClick={() => isShowHtmlModal(true, record.I_ID)}>word生成html</a>
         </>
       ]
     }
@@ -160,7 +206,7 @@ const Applications: React.FC = () => {
           pageSize: 20,
           current: 1
         }}
-        toolBarRender={(action, {selectedRows}) => [ //工具栏 与 表头headerTitle同一行 可设置为false，设置false表头无效
+        toolBarRender={(action, {selectedRowKeys}) => [ //工具栏 与 表头headerTitle同一行 可设置为false，设置false表头无效
           <Button
             icon={<PlusOutlined/>}  //图标，其他图标可去ant官网搜索icon，单击即可复制
             type="primary"   //设置为主要键（蓝色）, 不加为白色,只能有一个type="primary"
@@ -196,6 +242,30 @@ const Applications: React.FC = () => {
           />
         )
       }
+
+      <ModalForm
+        title={'word转换html'}
+        width="1200px"
+        visible={isHtmlModalVisible} //显示或隐藏
+        onVisibleChange={handleCancelHtml} //设置显示或隐藏
+      >
+        <ProDescriptions
+          title={false}
+          column={3}
+          bordered
+          dataSource={word2html}
+        >
+          <ProDescriptions.Item dataIndex="V_HTML" span={2} label="html" valueType="code" copyable/>
+        </ProDescriptions>
+      </ModalForm>
+
+      <ViewHtml
+        title={'查看模版'}
+        isModalVisible={isViewSafeDataModalVisible}
+        handleCancel={handleCancel}
+        html={html}
+      >
+      </ViewHtml>
     </PageContainer>
   );
 };

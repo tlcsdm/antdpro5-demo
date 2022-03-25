@@ -4,32 +4,33 @@ import {Button, Image} from 'antd';
 import Modal from "antd/es/modal/Modal";
 import Cookies from "js-cookie";
 
-const InsertProcessDefinition = (props: any) => {
-  const {isModalDiagramVisible, isShowDiagramModal, deploymentId} = props;
-  const [deployId, setDeployId] = useState(undefined);
+const ViewProcessDiagram = (props: any) => {
+  const {isProcessDiagramModalVisible, isShowProcessDiagramModal, procInstanceId} = props;
+  const [processInstanceId, setProcessInstanceId] = useState(undefined);
+
   //初始化
   useEffect(() => {
-    setDeployId(deploymentId);
+    setProcessInstanceId(procInstanceId);
   }, []);
 
   const handleCancel = () => {
-    isShowDiagramModal(false);
+    isShowProcessDiagramModal(false);
   };
 
   return (
     <Modal
       title={'查看流程图'}
       width="500px"
-      visible={isModalDiagramVisible}
+      visible={isProcessDiagramModalVisible}
       footer={[<Button key="close" type="primary" onClick={handleCancel}>关闭</Button>,]}
       onCancel={handleCancel}
     >
       <Image
         width={400}
         height={500}
-        src={"/api/contract-system/loadProcessDefinitionDiagramByDeploymentId?deploymentId=" + deployId + '&V_PERCODE=' + Cookies.get('V_PERCODE') + '&random=' + Math.random()}
+        src={"/api/contract-system/loadProcessInstanceDiagram?processInstanceId=" + processInstanceId + '&V_PERCODE=' + Cookies.get('V_PERCODE') + '&random=' + Math.random()}
       />
     </Modal>
   );
 };
-export default InsertProcessDefinition;
+export default ViewProcessDiagram;

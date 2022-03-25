@@ -10,11 +10,15 @@ import {deletePerson, initPersonPassWord, selectPerson, updatePersonStatus} from
 import {statusEnum} from "@/utils/enum";
 import ViewPerson from "@/pages/contract/common/person/components/ViewPerson";
 import StatusSwitch from "@/components/StatusSwitch";
+import ResetPwd from "@/pages/contract/common/person/components/ResetPwd";
+import sha256 from 'crypto-js/sha256';
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isViewPersonModalVisible, setIsViewPersonModalVisible] = useState(false);
+  const [resetPwdModalVisible, setResetPwdModalVisible] = useState<boolean>(false);
+  const [id, setId] = useState(undefined);
   const [personId, setPersonId] = useState(undefined);
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
@@ -51,21 +55,6 @@ const Applications: React.FC = () => {
     if (req && req.success) {
       message.success('删除成功，即将刷新');
       actionRef.current?.reloadAndRest?.(); //刷新Protable
-    }
-    return true;
-  };
-
-  //初始化密码
-  const initPasswd = async (id: any) => {
-    if (!id) return true;
-    const hide = message.loading('正在初始化密码');
-    const req = await initPersonPassWord({
-      I_ID: id,
-      V_PASSWORD: '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92'
-    });
-    hide();
-    if (req && req.success) {
-      message.success('初始化密码成功');
     }
     return true;
   };
@@ -152,11 +141,10 @@ const Applications: React.FC = () => {
             <a href="#">删除</a>
           </Popconfirm>
           <Divider type="vertical"/>
-          <Popconfirm key={record.I_ID} title="确认初始化密码为123456？" okText="确认" cancelText="取消" onConfirm={(e) => {
-            initPasswd(record.I_ID)
-          }}>
-            <a href="#">初始化密码</a>
-          </Popconfirm>
+          <a key={record.I_ID} onClick={() => {
+            setId(record.I_ID);
+            setResetPwdModalVisible(true);
+          }}>密码重置</a>
         </>
       ]
     }
@@ -232,6 +220,25 @@ const Applications: React.FC = () => {
           />
         )
       }
+
+      <ResetPwd
+        onSubmit={async (value: any) => {
+          const req = await initPersonPassWord({
+            I_ID: id,
+            V_PASSWORD: sha256(value.password).toString()
+          });
+          if (req && req.success) {
+            message.success('密码重置成功');
+            setResetPwdModalVisible(false);
+            setId(undefined);
+          }
+        }}
+        onCancel={() => {
+          setResetPwdModalVisible(false);
+          setId(undefined);
+        }}
+        resetPwdModalVisible={resetPwdModalVisible}
+      />
     </PageContainer>
   );
 };

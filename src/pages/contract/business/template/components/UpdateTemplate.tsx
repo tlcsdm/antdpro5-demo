@@ -22,7 +22,8 @@ const UpdateTemplate = (props: any) => {
   const initTemplate = async () => {
     const response = await loadTemplate({I_ID: templateId});
     const templateData = response.data;
-    setTemplate({...response.data});
+    templateData['V_HTML'] = decodeURIComponent(templateData['V_HTML']);
+    setTemplate({...templateData});
     Object.keys(templateData).forEach(key => formObj.setFieldsValue({[`${key}`]: templateData[key]}));
   };
 
@@ -70,6 +71,7 @@ const UpdateTemplate = (props: any) => {
         formData.append('V_DESCRIPTION', value.V_DESCRIPTION === undefined ? '' : value.V_DESCRIPTION); //模板描述
         formData.append('V_TYPEID', value.V_TYPEID); //模板类型
         formData.append('V_TEMPTYPE', value.V_TEMPTYPE); //是否集团模板
+        formData.append('V_HTML', encodeURIComponent(value.V_HTML));
         let resp = [];
         if (template === undefined) {
           resp = await insertTemplate(formData);
@@ -151,6 +153,21 @@ const UpdateTemplate = (props: any) => {
           {
             required: false,
             message: '模版描述为必填项'
+          }
+        ]}
+      />
+      <ProFormTextArea
+        label="html代码"
+        width="lg"
+        name="V_HTML"
+        fieldProps={{
+          style: {height: 400}
+        }}
+        allowClear
+        rules={[
+          {
+            required: false,
+            message: 'html代码为必填项'
           }
         ]}
       />

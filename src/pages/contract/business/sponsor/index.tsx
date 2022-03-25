@@ -53,6 +53,12 @@ const Applications: React.FC = () => {
       hideInTable: false,
       render: (text, record, index) => `${index + 1}`
     }, {
+      title: '定作方简称',
+      dataIndex: 'V_SIMPLENAME',
+      width: 150,
+      hideInSearch: true,
+      hideInTable: false
+    }, {
       title: '定作方名称',
       dataIndex: 'V_SPONSORNAME',
       width: 150,

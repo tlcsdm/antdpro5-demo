@@ -1,37 +1,54 @@
-import {Button, Divider, message, Popconfirm} from 'antd';
+import {Button, Divider, Dropdown, Menu, message, Popconfirm} from 'antd';
 import React, {useEffect, useRef, useState} from 'react';
 import {PageContainer} from '@ant-design/pro-layout';
 import ProTable, {ActionType, ProColumns} from '@ant-design/pro-table';
 import 'moment/locale/zh-cn'
 import {ProFormInstance} from '@ant-design/pro-form';
 import {activityStatus} from "@/utils/enum";
-import {PlusOutlined} from "@ant-design/icons/lib";
+import {DownOutlined} from "@ant-design/icons/lib";
 import UpdateContractPreparation
   from "@/pages/contract/business/contractPreparation/components/UpdateContractPreparation";
-import {deleteContract, selectContract} from "@/services/contract/common/contractPreparation";
+import {
+  deleteContract,
+  selectContract,
+  selectFirstTaskProcCandidate, startContractProcess
+} from "@/services/contract/common/contractPreparation";
 import {selectDept} from "@/services/contract/common/dept";
 import {selectMajor} from "@/services/contract/business/major";
-import moment from "moment";
 import PreChooseSponsor from "@/components/Choose/PreChooseSponsor";
 import PreChooseContractor from "@/components/Choose/PreChooseContractor";
 import '@/utils/style.less'
+import {getDate, getMonthFirstDay} from "@/utils/date";
+import EditContractRider from "@/pages/contract/business/contractRider/EditContractRider";
+import {useModel} from "@@/plugin-model/useModel";
+import {selectMajorToFlow} from "@/services/contract/business/majorToFlow";
+import PreChooseCandidate from "@/components/Choose/PreChooseCandidate";
 
 /* React.FC<>的在typescript使用的一个泛型，FC就是FunctionComponent的缩写，是函数组件，在这个泛型里面可以使用useState */
 const Applications: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isSponsorModalVisible, setIsSponsorModalVisible] = useState(false);
   const [isContractorModalVisible, setIsContractorModalVisible] = useState(false);
+  const [isContractRiderModalVisible, setIsContractRiderModalVisible] = useState(false);
+  const [isCandidateModalVisible, setIsCandidateModalVisible] = useState(false);
   const [contractId, setContractId] = useState(undefined);
   const [sponsor, setSponsor] = useState(undefined);
   const [contractor, setContractor] = useState(undefined);
+  const [guid, setGuid] = useState(undefined);
+  const [contractType, setcontractType] = useState(undefined);
+  const [processDefinitionKey, setProcessDefinitionKey] = useState(undefined);
+  const [candidateDataSource, setCandidateDataSource] = useState([]);
+  const [candidate, setCandidate] = useState(undefined);
   const actionRef = useRef<ActionType>();
   const formRef = useRef<ProFormInstance>();
+  const {initialState} = useModel('@@initialState');
 
   /**
    * 控制模态框显示和隐藏
    */
-  const isShowModal = (show: boolean | ((prevState: boolean) => boolean), id = undefined) => {
+  const isShowModal = (show: boolean | ((prevState: boolean) => boolean), type = undefined, id = undefined) => {
     setContractId(id);
+    setcontractType(type);
     setIsModalVisible(show);
   };
 
@@ -41,6 +58,15 @@ const Applications: React.FC = () => {
 
   const isShowContractorModal = (show: boolean | ((prevState: boolean) => boolean)) => {
     setIsContractorModalVisible(show);
+  };
+
+  const isShowContractRiderModal = (show: boolean | ((prevState: boolean) => boolean), id = undefined) => {
+    setGuid(id);
+    setIsContractRiderModalVisible(show);
+  };
+
+  const isShowCandidateModal = (show: boolean | ((prevState: boolean) => boolean)) => {
+    setIsCandidateModalVisible(show);
   };
 
   //useEffect参数为空数组时仅初始化执行一次
@@ -68,11 +94,19 @@ const Applications: React.FC = () => {
     }
   }, [contractor]);
 
+  // @ts-ignore
+  useEffect(async () => {
+    if (candidate !== undefined) {
+      startApproval();
+    }
+  }, [candidate]);
+
   //单位
   const [orgList, setOrgList] = useState([]);
   const initOrg = async () => {
     const deptList = await selectDept({
-      V_DEPTTYPE: '厂矿'
+      V_DEPTTYPE: '厂矿',
+      V_DEPTCODE: (initialState as any).currentUser.V_ORGCODE,
     });
     const orgTempList: any = [];
     deptList.data.forEach(function (item: any) {
@@ -141,9 +175,51 @@ const Applications: React.FC = () => {
     return true;
   };
 
+  //上报
+  const submitContractProcess = async (majorId: any, type: any, id: any) => {
+    setContractId(id);
+    onSelectMajorFlow(majorId, type);//流程定义key
+  };
+
+  //查询流程定义key
+  const onSelectMajorFlow = async (majorId: any, contractType: any) => {
+    const majorList = await selectMajorToFlow({V_MAJORID: majorId, V_CONTYPE: contractType});
+    onSelectCandidate(majorList.data[0].KEY_);//查询第一步候选人
+    setProcessDefinitionKey(majorList.data[0].KEY_);
+  };
+
+  //查询第一步候选人
+  const onSelectCandidate = async (key: any) => {
+    const procCandidateList = await selectFirstTaskProcCandidate({
+      processDefinitionKey: key,
+      taskDefinitionKey: 'companyLeader',
+      orgCode: (initialState as any).currentUser.V_DEPTCODE
+    });
+    setCandidateDataSource(procCandidateList.data);
+    isShowCandidateModal(true);
+  };
+
+  //流程上报
+  const startApproval = async () => {
+    const hide = message.loading('处理中...');
+    let response = await startContractProcess({
+      I_ID: contractId,
+      ASSIGNEE_: 'EMP[' + (candidate as any).value + ']',
+      PROCESS_DEFINITION_KEY_: processDefinitionKey
+    });
+    hide();
+    if (response && response.success) {
+      message.success("操作成功! [上报成功! 下一步流程处理人:" + (candidate as any).label + ']');
+      actionRef.current?.reloadAndRest?.(); //刷新Protable
+    } else {
+      return false;
+    }
+    return true;
+  };
+
   const columns: ProColumns[] = [  //定义 Protable的列 columns放在Protable
     {
-      title: '定作方',
+      title: '定制方',
       dataIndex: 'V_SPONSOR',
       width: 180,
       hideInTable: true,
@@ -165,18 +241,20 @@ const Applications: React.FC = () => {
         },
       },
     }, {
-      title: '开始时间',
-      dataIndex: 'V_BDATE',
-      valueType: 'date',   //定义时间类型，用于Search中
-      hideInTable: true,  //在Protable中隐藏，不显示
-      initialValue: moment(moment().year() + '-01-01').format('YYYY-MM-DD')
-    },
-    {
-      title: '结束时间',
-      dataIndex: 'V_EDATE',
-      valueType: 'date',
+      title: '起始时间',
+      dataIndex: 'D_DATE_CREATE',
+      valueType: 'dateRange',
+      order: 3,
+      initialValue: [getMonthFirstDay(), getDate()],
+      search: {
+        transform: (value) => {
+          return {
+            V_BEGIN_DATE: value[0],
+            V_END_DATE: value[1],
+          };
+        },
+      },
       hideInTable: true,
-      initialValue: moment(moment().year() + '-' + (moment().month() + 1) + '-' + moment().date()).format('YYYY-MM-DD'),
     }, {
       title: '单位',
       dataIndex: 'V_DEPTCODE',
@@ -217,8 +295,8 @@ const Applications: React.FC = () => {
       hideInTable: false,
       render: (text, record, index) => `${index + 1}`
     }, {
-      title: '定作方',
-      dataIndex: 'V_SPONSORNAME',
+      title: '定制方',
+      dataIndex: 'V_SPONSORABBR',
       width: 180,
       hideInSearch: true,
       hideInTable: false,
@@ -243,15 +321,9 @@ const Applications: React.FC = () => {
       render: (val: any) => val / 10000,
       className: 'column-right',
     }, {
-      title: '附件',
-      dataIndex: '',
-      width: 80,
-      hideInSearch: true,
-      hideInTable: false
-    }, {
       title: '承揽方',
       dataIndex: 'V_CONTRACTORNAME',
-      width: 180,
+      width: 200,
       hideInSearch: true,
       hideInTable: false
     }, {
@@ -273,21 +345,34 @@ const Applications: React.FC = () => {
       hideInSearch: true,
       hideInTable: false
     }, {
+      title: '附件',
+      width: 60,
+      fixed: 'right',
+      hideInSearch: true,
+      hideInTable: false,
+      render: (text, record, index) => [
+        <a key={record.I_ID} onClick={() => isShowContractRiderModal(true, record.I_ID)}>查看</a>,
+      ]
+    }, {
       title: '操作',
+      fixed: 'right',
       width: 180,
       hideInSearch: true,
       valueType: 'option',  //操作列的类型
       render: (_, record) => [   //render渲染 record代表当前行
         <>
           <a key={record.I_ID} style={{display: ((record.V_INST_STATUS === 3) ? 'inline' : 'none')}}
-             onClick={() => isShowModal(true, record.I_ID)}>编辑</a>
+             onClick={() => isShowModal(true, record.V_CONTRACTTYPE, record.I_ID)}>编辑</a>
           <Divider type="vertical" style={{display: ((record.V_INST_STATUS === 3) ? 'inline' : 'none')}}/>
-          <Popconfirm disabled={record.V_INST_STATUS !== 3} key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消"
-                      onConfirm={() => {
-                        handleRemove(record.I_ID, record.V_INST_STATUS)
-                      }}>
+          <a key={record.I_ID} style={{display: ((record.V_INST_STATUS === 3) ? 'inline' : 'none')}}
+             onClick={() => submitContractProcess(record.V_MAJORID, record.V_ACCORDANCE, record.I_ID)}>上报</a>
+          <Divider type="vertical" style={{display: ((record.V_INST_STATUS === 3) ? 'inline' : 'none')}}/>
+          {(record.V_INST_STATUS === 3) &&
+          <Popconfirm key={record.I_ID} title="确认删除？" okText="确认" cancelText="取消" onConfirm={() => {
+            handleRemove(record.I_ID, record.V_INST_STATUS)
+          }}>
             <a href="#">删除</a>
-          </Popconfirm>
+          </Popconfirm>}
         </>
       ]
     }
@@ -314,14 +399,64 @@ const Applications: React.FC = () => {
           current: 1
         }}
         toolBarRender={(action, {selectedRows}) => [ //工具栏 与 表头headerTitle同一行 可设置为false，设置false表头无效
-          <Button
-            icon={<PlusOutlined/>}  //图标，其他图标可去ant官网搜索icon，单击即可复制
-            type="primary"   //设置为主要键（蓝色）, 不加为白色,只能有一个type="primary"
-            onClick={() => {  //点击事件
-              isShowModal(true);
-            }}>
-            起草
-          </Button>
+          <Dropdown
+            overlay={
+              <Menu
+                selectedKeys={[]}
+              >
+                <Menu.Item
+                  key="add"
+                  onClick={async () => {
+                    // @ts-ignore
+                    isShowModal(true, '新建合同');
+                  }}
+                >
+                  新建合同
+                </Menu.Item>
+                <Menu.Item
+                  key="change"
+                  onClick={async () => {
+                    // @ts-ignore
+                    isShowModal(true, '合同变更');
+                  }}
+                >
+                  合同变更
+                </Menu.Item>
+                <Menu.Item
+                  key="relate"
+                  onClick={async () => {
+                    // @ts-ignore
+                    isShowModal(true, '合同关联');
+                  }}
+                >
+                  合同关联
+                </Menu.Item>
+                <Menu.Item
+                  key="delay"
+                  onClick={async () => {
+                    // @ts-ignore
+                    isShowModal(true, '合同延续');
+                  }}
+                >
+                  合同延续
+                </Menu.Item>
+                <Menu.Item
+                  key="childContract"
+                  onClick={async () => {
+                    // @ts-ignore
+                    isShowModal(true, '子母合同');
+                  }}
+                >
+                  子母合同
+                </Menu.Item>
+              </Menu>
+            }
+          >
+            <Button>
+              起草类型 <DownOutlined/>
+            </Button>
+          </Dropdown>
+
         ]}
         search={{
           defaultCollapsed: false,
@@ -346,6 +481,7 @@ const Applications: React.FC = () => {
             isShowModal={isShowModal}
             actionRef={actionRef}
             contractId={contractId}
+            contractType={contractType}
           />
         )
       }
@@ -370,6 +506,34 @@ const Applications: React.FC = () => {
             isContractorModalVisible={isContractorModalVisible}
             isShowContractorModal={isShowContractorModal}
             setContractor={setContractor}
+          />
+        )
+      }
+
+      {
+        // 模态框隐藏的时候, 不挂载组件; 模态显示时候再挂载组件, 这样是为了触发子组件的生命周期
+        !isContractRiderModalVisible ? (
+          ''
+        ) : (
+          <EditContractRider
+            isContractRiderModalVisible={isContractRiderModalVisible}
+            isShowContractRiderModal={isShowContractRiderModal}
+            riderGuid={guid}
+            type={'管理'}
+          />
+        )
+      }
+
+      {
+        // 模态框隐藏的时候, 不挂载组件; 模态显示时候再挂载组件, 这样是为了触发子组件的生命周期
+        !isCandidateModalVisible ? (
+          ''
+        ) : (
+          <PreChooseCandidate
+            isCandidateModalVisible={isCandidateModalVisible}
+            isShowCandidateModal={isShowCandidateModal}
+            candidateDataSource={candidateDataSource}
+            setCandidate={setCandidate}
           />
         )
       }
