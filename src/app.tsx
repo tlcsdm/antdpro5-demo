@@ -10,6 +10,7 @@ import Cookies from "js-cookie";
 import {selectPersonMenuTree} from "@/services/contract/common/menu";
 import {iconMap} from "@/utils/iconMap";
 import {getLocalStorage, setLocalStorage} from "@/utils/Storage";
+import {BackTop} from "antd";
 // import {Input} from 'antd';
 
 // const isDev = process.env.NODE_ENV === 'development';
@@ -165,6 +166,7 @@ export const layout: RunTimeLayoutConfig = ({initialState, setInitialState}) => 
       return (
         <>
           {children}
+          <BackTop/>
           {!props.location?.pathname?.includes('/login')
             //布局开发工具
             // && (
