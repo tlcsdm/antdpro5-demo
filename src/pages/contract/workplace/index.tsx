@@ -89,8 +89,8 @@ const data5 = [
 ];
 const data6 = [
   '设备专项考核2020年166号',
-  '鞍钢集团矿业有限公司固定资产投资项目',
-  '2020年设备部新修订公文',
+  'xx有限公司固定资产投资项目',
+  '2020年xx新修订公文',
 ];
 const links = [
   {
@@ -199,8 +199,8 @@ const PageHeaderContent: React.FC<{ currentUser: CurrentUser }> = ({ currentUser
         <Avatar size="large" src={'https://img0.baidu.com/it/u=1489807627,808259306&fm=26&fmt=auto&gp=0.jpg'} />
       </div>
       <div className={styles.content}>
-        <div className={styles.contentTitle}>早安， 高军驰 ，祝您开心每一天！</div>
-        <div>鞍钢矿业爆破有限公司/执行总经理</div>
+        <div className={styles.contentTitle}>早安， xxx ，祝您开心每一天！</div>
+        <div>xx有限公司/执行总经理</div>
       </div>
     </div>
   );
@@ -321,7 +321,7 @@ class Workplace extends Component<WorkplaceProps> {
                             <Button danger type="dashed" shape="round" icon={<EditOutlined />} size="small" >办理</Button>,
                           ]}
                         >
-                          <Meta avatar={<Avatar src={logo_oa} />} title="公文系统" description="关于参加鞍钢集团审计和巡视发现问题专项培训的通知" />
+                          <Meta avatar={<Avatar src={logo_oa} />} title="公文系统" description="关于参加xx集团审计和巡视发现问题专项培训的通知" />
                         </Card>
                       </Col>
                       <Col span={8}>

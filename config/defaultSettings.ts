@@ -13,7 +13,7 @@ const Settings: LayoutSettings & {
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: '鞍钢矿业合同系统',
+  title: 'xx合同系统',
   pwa: false,
   logo: '/favicon.ico',
   iconfontUrl: '',

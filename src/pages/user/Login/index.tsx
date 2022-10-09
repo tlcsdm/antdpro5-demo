@@ -81,7 +81,7 @@ const Login: React.FC = () => {
       <div className={styles.content}>
         <LoginForm
           logo={<img alt="logo" src="/favicon.ico"/>}
-          title="鞍钢矿业合同管理系统"
+          title="xx合同管理系统"
           //subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           initialValues={{
             //autoLogin: true,

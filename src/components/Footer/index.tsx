@@ -11,8 +11,8 @@ const Footer: React.FC = () => {
       links={[
         {
           key: '',
-          title: '鞍钢集团矿业公司网站',
-          href: 'http://www.ansteel.cn/',
+          title: 'xx公司网站',
+          href: 'https://www.tlcsdm.com',
           blankTarget: true,
         },
       ]}
